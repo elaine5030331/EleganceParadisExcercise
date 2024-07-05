@@ -1,4 +1,7 @@
 
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace EleganceParadisAPI
 {
     public class Program
@@ -10,6 +13,7 @@ namespace EleganceParadisAPI
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("EleganceParadisDB")));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
