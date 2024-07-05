@@ -1,0 +1,6 @@
+@EleganceParadisAPI_HostAddress = http://localhost:5017
+
+GET {{EleganceParadisAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
