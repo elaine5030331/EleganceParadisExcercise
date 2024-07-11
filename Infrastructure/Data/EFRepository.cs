@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
-    internal class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class EFRepository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected EleganceParadisContext DbContext;
         protected DbSet<TEntity> DbSet;
