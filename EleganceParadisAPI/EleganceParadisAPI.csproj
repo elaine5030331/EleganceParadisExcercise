@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>93e7405e-0cdd-4183-9b75-bd45fca20310</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
