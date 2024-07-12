@@ -1,4 +1,5 @@
-﻿using EleganceParadisAPI.Services;
+﻿using ApplicationCore.Services;
+using Infrastructure.Data.Services;
 
 namespace EleganceParadisAPI.Configurations
 {
@@ -6,8 +7,6 @@ namespace EleganceParadisAPI.Configurations
     {
         public static IServiceCollection AddWebAPIServices(this IServiceCollection services)
         {
-            //services.AddScoped<CategoryService, CategoryService>();
-            services.AddScoped<CategoryService>();
             return services;
         }
     }

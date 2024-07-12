@@ -1,4 +1,4 @@
-﻿namespace EleganceParadisAPI.DTOs
+﻿namespace ApplicationCore.Interfaces.DTOs
 {
     public class CategoryDTO
     {

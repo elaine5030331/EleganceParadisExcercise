@@ -1,5 +1,4 @@
-﻿using EleganceParadisAPI.Services;
-using Microsoft.AspNetCore.Http;
+﻿using ApplicationCore.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.Controllers
@@ -8,9 +7,9 @@ namespace EleganceParadisAPI.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(CategoryService categoryService)
+        public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }

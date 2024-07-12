@@ -1,10 +1,10 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
-using EleganceParadisAPI.DTOs;
+using ApplicationCore.Interfaces.DTOs;
 
-namespace EleganceParadisAPI.Services
+namespace ApplicationCore.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private IRepository<Category> _categoryRepo;
 
