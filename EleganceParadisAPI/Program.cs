@@ -2,6 +2,7 @@
 using EleganceParadisAPI.Configurations;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 namespace EleganceParadisAPI
@@ -16,7 +17,7 @@ namespace EleganceParadisAPI
 
             Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
             //builder.Services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("EleganceParadisDB")));
-          
+
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,10 +26,36 @@ namespace EleganceParadisAPI
             {
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { 
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        }, 
+                        new List<string>() 
+                    } 
+                });
             });
 
             builder.Services.AddApplicationCoreServices()
-                            .AddWebAPIServices();
+                            .AddWebAPIServices()
+                            .AddAuthServices(builder.Configuration);
 
             var app = builder.Build();
 
