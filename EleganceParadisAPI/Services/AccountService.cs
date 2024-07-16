@@ -11,7 +11,8 @@ namespace EleganceParadisAPI.Services
         private readonly IRepository<Account> _accountRepo;
         private readonly IRepository<Customer> _customerRepo;
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
-        private const string mobilePattern = @"^\d{10}$";
+        private const string mobilePattern = @"^09\d{8}$";
+        private const string emailPattern = @".*@.*\..*";
 
         public AccountService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo)
         {
@@ -33,9 +34,9 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<CreateAccountResultDTO>("電話號碼格式有誤");
             }
-            if (string.IsNullOrEmpty(registInfo.Email))
+            if (!Regex.IsMatch(registInfo.Email, emailPattern))
             {
-                return new OperationResult<CreateAccountResultDTO>("請輸入電子郵件");
+                return new OperationResult<CreateAccountResultDTO>("電子郵件格式有誤");
             }
             if (!Regex.IsMatch(registInfo.Password, passwordPattern))
             {
@@ -112,9 +113,9 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<UpdateCustomerResult>("請輸入名字");
             }
-            if (string.IsNullOrEmpty(customerInfo.Email))
+            if (!Regex.IsMatch(customerInfo.Email, emailPattern))
             {
-                return new OperationResult<UpdateCustomerResult>("電子信箱不可空白");
+                return new OperationResult<UpdateCustomerResult>("電子信箱格式有誤");
             }
             if (!Regex.IsMatch(customerInfo.Mobile, mobilePattern))
             {
