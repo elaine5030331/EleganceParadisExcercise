@@ -13,6 +13,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddTransient<IProductQueryService, ProductQueryService>();
+            services.AddScoped<IUserManageService, UserManageService>();
             return services;
         }
     }

@@ -1,6 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
+using Dapper;
+using EleganceParadisAPI.Controllers;
+using Microsoft.AspNetCore.Connections;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -12,6 +18,9 @@ namespace EleganceParadisAPI.Helpers
     public class JWTHelper
     {
         private readonly IConfiguration _configuration;
+        private readonly IRepository<Customer> _customerRepo;
+        private readonly IRepository<Account> _accountRepo;
+        private readonly IDbConnection _connection;
 
         public JWTHelper(IConfiguration configuration)
         {
@@ -28,7 +37,7 @@ namespace EleganceParadisAPI.Helpers
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userName));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             //新增角色
-            if(roles != null)
+            if (roles != null)
             {
                 foreach (var role in roles)
                 {
@@ -64,10 +73,11 @@ namespace EleganceParadisAPI.Helpers
             };
 
         }
-    }
-    public class JWTDTO
-    {
-        public string Token { get; set; }
-        public long ExpireTime { get; set; }
+
+        public class JWTDTO
+        {
+            public string Token { get; set; }
+            public long ExpireTime { get; set; }
+        }
     }
 }
