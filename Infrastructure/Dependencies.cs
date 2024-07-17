@@ -1,4 +1,7 @@
-﻿using Infrastructure.Data;
+﻿using ApplicationCore.Entities;
+using Infrastructure.Data;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
@@ -19,6 +22,9 @@ namespace Infrastructure
         {
             services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(configuration.GetConnectionString("EleganceParadisDB")));
             services.AddTransient<IDbConnection>(sp => new SqlConnection(configuration.GetConnectionString("EleganceParadisDB")));
+            //包含所有IdentityCore的實作
+            services.AddIdentityCore<Account>();
+            //services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>(); → 以包含在AddIdentityCore<TUser>()
         }
     }
 }

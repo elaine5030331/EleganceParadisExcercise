@@ -3,6 +3,7 @@ using ApplicationCore.Services;
 using EleganceParadisAPI.Services;
 using Infrastructure.Data;
 using Infrastructure.Data.Services;
+using Infrastructure.Services;
 
 namespace EleganceParadisAPI.Configurations
 {
@@ -14,6 +15,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddTransient<IProductQueryService, ProductQueryService>();
             services.AddScoped<IUserManageService, UserManageService>();
+            services.AddScoped<IApplicationPasswordHasher, ApplicationPasswordHasherService>();
             return services;
         }
     }

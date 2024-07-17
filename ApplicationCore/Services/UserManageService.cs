@@ -12,11 +12,13 @@ namespace ApplicationCore.Services
     {
         private readonly IRepository<Account> _accountRepo;
         private readonly IRepository<Customer> _customerRepo;
+        private readonly IApplicationPasswordHasher _applicationPasswordHasher;
 
-        public UserManageService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo)
+        public UserManageService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo, IApplicationPasswordHasher applicationPasswordHasher)
         {
             _accountRepo = accountRepo;
             _customerRepo = customerRepo;
+            _applicationPasswordHasher = applicationPasswordHasher;
         }
 
         public async Task<bool> AuthenticateUser(string email, string password)
@@ -25,7 +27,7 @@ namespace ApplicationCore.Services
             if (customer == null) return false;
             var account = await _accountRepo.FirstOrDefaultAsync(x => x.Id == customer.Id);
             if (account == null) return false;
-            return account.Password == password;
+            return _applicationPasswordHasher.VerifyPassword(account.Password, password);
         }
     }
 }

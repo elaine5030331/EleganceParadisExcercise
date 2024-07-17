@@ -10,14 +10,16 @@ namespace EleganceParadisAPI.Services
     {
         private readonly IRepository<Account> _accountRepo;
         private readonly IRepository<Customer> _customerRepo;
+        private readonly IApplicationPasswordHasher _applicationPasswordHasher;
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
         private const string mobilePattern = @"^09\d{8}$";
         private const string emailPattern = @".*@.*\..*";
 
-        public AccountService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo)
+        public AccountService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo, IApplicationPasswordHasher applicationPasswordHasher)
         {
             _accountRepo = accountRepo;
             _customerRepo = customerRepo;
+            _applicationPasswordHasher = applicationPasswordHasher;
         }
 
         public async Task<OperationResult<CreateAccountResultDTO>> CreateAccount(RegistDTO registInfo)
@@ -50,7 +52,7 @@ namespace EleganceParadisAPI.Services
             var account = new Account
             {
                 Account1 = registInfo.Email,
-                Password = registInfo.ConfirmedPassword,
+                Password = _applicationPasswordHasher.HashPassword(registInfo.ConfirmedPassword),
                 CreateAt = DateTimeOffset.UtcNow,
                 Status = AccountStatus.Unverified,
                 Customer = new Customer
@@ -151,17 +153,20 @@ namespace EleganceParadisAPI.Services
         public async Task<OperationResult<UpdateAccountResult>> UpdateAccountPassword(UpdateAccountPassword accountInfo)
         {
             if (accountInfo.OldPassword == accountInfo.NewPassword)
-            {
                 return new OperationResult<UpdateAccountResult>("新密碼與舊密碼不可相同");
-            }
+
             if (!Regex.IsMatch(accountInfo.NewPassword, passwordPattern))
-            {
                 return new OperationResult<UpdateAccountResult>("密碼格式有誤");
-            }
+
             var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
-            if (account == null) return new OperationResult<UpdateAccountResult>("查無此人");
-            if (account.Password != accountInfo.OldPassword) return new OperationResult<UpdateAccountResult>("舊密碼有誤");
-            account.Password = accountInfo.NewPassword;
+
+            if (account == null) 
+                return new OperationResult<UpdateAccountResult>("查無此人");
+
+            if (!_applicationPasswordHasher.VerifyPassword(account.Password, accountInfo.OldPassword))
+                return new OperationResult<UpdateAccountResult>("舊密碼有誤");
+
+            account.Password = _applicationPasswordHasher.HashPassword(accountInfo.NewPassword);
 
             var updatedInfo = await _accountRepo.UpdateAsync(account);
             var updatedResult = new UpdateAccountResult

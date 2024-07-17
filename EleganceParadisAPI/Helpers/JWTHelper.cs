@@ -1,32 +1,18 @@
-﻿using ApplicationCore.Entities;
-using ApplicationCore.Interfaces;
-using Dapper;
-using EleganceParadisAPI.Controllers;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EleganceParadisAPI.Helpers
 {
     public class JWTHelper
     {
         private readonly IConfiguration _configuration;
-        private readonly IRepository<Customer> _customerRepo;
-        private readonly IRepository<Account> _accountRepo;
-        private readonly IDbConnection _connection;
-
         public JWTHelper(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
+         
         public JWTDTO GenerateToken(string userName, IEnumerable<string> roles, int expireMinutes = 60)
         {
             var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
