@@ -25,7 +25,7 @@ namespace EleganceParadisAPI
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("http://eleganceparadis.azurewebsites.net",
+                        policy.WithOrigins("https://eleganceparadis.azurewebsites.net",
                                            "http://localhost:5173/")
                                             .AllowAnyHeader()
                                             .AllowAnyMethod();
