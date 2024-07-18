@@ -22,9 +22,8 @@ namespace Infrastructure
         {
             services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(configuration.GetConnectionString("EleganceParadisDB")));
             services.AddTransient<IDbConnection>(sp => new SqlConnection(configuration.GetConnectionString("EleganceParadisDB")));
-            //包含所有IdentityCore的實作
-            services.AddIdentityCore<Account>();
-            //services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>(); → 以包含在AddIdentityCore<TUser>()
+            //services.AddIdentityCore<Account>(); → 包含所有IdentityCore的實作
+            services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>(); 
         }
     }
 }
