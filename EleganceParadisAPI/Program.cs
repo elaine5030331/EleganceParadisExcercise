@@ -26,7 +26,7 @@ namespace EleganceParadisAPI
                     policy =>
                     {
                         policy.WithOrigins("https://eleganceparadis.azurewebsites.net",
-                                           "http://localhost:5173/")
+                                           "http://localhost:5173")
                                             .AllowAnyHeader()
                                             .AllowAnyMethod();
                     });
