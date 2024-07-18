@@ -28,7 +28,8 @@ namespace EleganceParadisAPI
                         policy.WithOrigins("https://eleganceparadis.azurewebsites.net",
                                            "http://localhost:5173")
                                             .AllowAnyHeader()
-                                            .AllowAnyMethod();
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
                     });
             });
 
