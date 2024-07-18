@@ -18,18 +18,6 @@ namespace EleganceParadisAPI
             Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
             //builder.Services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("EleganceParadisDB")));
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(
-                    policy =>
-                    {
-                        policy.WithOrigins("eleganceparadis.azurewebsites.net",
-                                           "http://localhost:5173/")
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod();
-                    });
-            });
-
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -51,7 +39,7 @@ namespace EleganceParadisAPI
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    {
+                    { 
                         new OpenApiSecurityScheme
                         {
                             Reference = new OpenApiReference
@@ -59,9 +47,9 @@ namespace EleganceParadisAPI
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
                             }
-                        },
-                        new List<string>()
-                    }
+                        }, 
+                        new List<string>() 
+                    } 
                 });
             });
 
@@ -79,7 +67,7 @@ namespace EleganceParadisAPI
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-            app.UseCors();
+
             app.UseAuthorization();
 
 
