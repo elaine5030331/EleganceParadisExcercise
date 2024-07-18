@@ -21,6 +21,16 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="registInfo"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///        "name": "ElaineKang", 
+        ///        "mobile": "0960123321", (格式：需為09開頭，並且電話號碼長度為10)
+        ///        "email": "ek@gmail.com", (格式：需包還 "@" 及 "." 字元)
+        ///        "password": "Aa*1234", (格式: 長度為6-20，需包含至少一個英文大寫、英文小寫、數字及符號)
+        ///        "comfirmedPassword": "Aa*1234" (需與密碼相同)
+        ///     }
+        /// </remarks>
         [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount(RegistDTO registInfo)
         {
