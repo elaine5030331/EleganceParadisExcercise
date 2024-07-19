@@ -45,7 +45,7 @@ namespace ApplicationCore.Services
             }
         }
 
-        public async Task<Product> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
+        public async Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
         {
             var product = _productRepo.GetById(productId);
             product.Spu = updateProductDTO.SPU;
@@ -53,7 +53,16 @@ namespace ApplicationCore.Services
             product.Enable = updateProductDTO.Enable;
             product.Order = updateProductDTO.Order;
             product.Description = updateProductDTO.Description;
-            return await _productRepo.UpdateAsync(product);
+            try
+            {
+                await _productRepo.UpdateAsync(product);
+                return new OperationResult();
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex,ex.Message);
+                return new OperationResult("更新失敗");
+            }
         }
 
         public async Task DeleteProductAsync(int id)

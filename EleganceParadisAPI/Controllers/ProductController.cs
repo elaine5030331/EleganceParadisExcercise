@@ -74,12 +74,15 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="productId"></param>
         /// <param name="updateProductDTO"></param>
         /// <returns></returns>
+        /// <response code ="204">更新成功</response>
+        /// <response code ="400">更新失敗</response>
         [HttpPut("UpdateProduct/{productId}")]
         public async Task<IActionResult> UpdateProduct(int productId, UpdateProductDTO updateProductDTO)
         {
             if (productId != updateProductDTO.ProductId) return BadRequest();
             var result = await _productService.UpdateProductAsync(productId, updateProductDTO);
-            return Ok(result);
+            if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpDelete("DeleteProduct/{productId}")]
