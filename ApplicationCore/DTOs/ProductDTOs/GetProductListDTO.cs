@@ -1,6 +1,6 @@
-﻿namespace ApplicationCore.Interfaces.DTOs
+﻿namespace ApplicationCore.DTOs.ProductDTOs
 {
-    public class ProductListDTO
+    public class GetProductListDTO
     {
         public int ProductId { get; set; }
         public string CategoryName { get; set; }

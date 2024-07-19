@@ -1,6 +1,6 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.DTOs;
+using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Interfaces.DTOs;
 
 namespace ApplicationCore.Services
 {

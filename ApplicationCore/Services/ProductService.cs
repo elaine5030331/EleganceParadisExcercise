@@ -1,6 +1,6 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.DTOs.ProductDTOs;
+using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
-using static ApplicationCore.Interfaces.DTOs.ProductEditDTO;
 
 namespace ApplicationCore.Services
 {

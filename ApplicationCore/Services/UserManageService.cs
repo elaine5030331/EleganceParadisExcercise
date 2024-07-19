@@ -1,6 +1,6 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.DTOs;
+using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Interfaces.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿namespace ApplicationCore.Interfaces.DTOs
+﻿namespace ApplicationCore.DTOs.ProductDTOs
 {
     public class ProductQueryResultDTO
     {

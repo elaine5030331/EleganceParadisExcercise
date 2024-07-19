@@ -1,7 +1,7 @@
 ﻿using ApplicationCore.Interfaces;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using static ApplicationCore.Interfaces.DTOs.ProductEditDTO;
+using ApplicationCore.DTOs.ProductDTOs;
 
 namespace EleganceParadisAPI.Controllers
 {

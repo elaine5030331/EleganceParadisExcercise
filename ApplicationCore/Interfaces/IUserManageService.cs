@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Interfaces.DTOs;
+﻿using ApplicationCore.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

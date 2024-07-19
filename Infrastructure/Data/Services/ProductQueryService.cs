@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Interfaces.DTOs;
+﻿using ApplicationCore.DTOs.ProductDTOs;
 using Dapper;
 using EleganceParadisAPI.Services;
 using System.Data;
@@ -14,7 +14,7 @@ namespace Infrastructure.Data.Services
             _connection = connection;
         }
 
-        public async Task<List<ProductListDTO>> GetProducts(int categoryId)
+        public async Task<List<GetProductListDTO>> GetProducts(int categoryId)
         {
             var parameter = new { CategoryId = categoryId };
             var sql = @"WITH MinUnitPrice_CTE(ProductId, MinUnitPrice)
@@ -39,7 +39,7 @@ namespace Infrastructure.Data.Services
                         AND ProductImages.[Order] = 1
                         ORDER BY Categories.[Order]";
 
-            return (await _connection.QueryAsync<ProductListDTO>(sql, parameter)).ToList();
+            return (await _connection.QueryAsync<GetProductListDTO>(sql, parameter)).ToList();
         }
 
         public async Task<ProductDTO> GetProductById(int productId)

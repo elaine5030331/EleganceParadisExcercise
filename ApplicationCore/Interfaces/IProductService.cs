@@ -1,5 +1,5 @@
-﻿using ApplicationCore.Entities;
-using static ApplicationCore.Interfaces.DTOs.ProductEditDTO;
+﻿using ApplicationCore.DTOs.ProductDTOs;
+using ApplicationCore.Entities;
 
 namespace ApplicationCore.Interfaces
 {
