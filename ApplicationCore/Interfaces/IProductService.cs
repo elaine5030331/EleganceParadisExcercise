@@ -8,6 +8,6 @@ namespace ApplicationCore.Interfaces
     {
         Task<OperationResult> AddProductAsync(AddProductDTO product);
         Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO);
-        Task DeleteProductAsync(int id);
+        Task<OperationResult> DeleteProductAsync(int id);
     }
 }

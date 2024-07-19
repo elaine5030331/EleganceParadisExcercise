@@ -85,11 +85,19 @@ namespace EleganceParadisAPI.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// 刪除產品
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        /// <response code ="204">更新成功</response>
+        /// <response code ="400">更新失敗</response>
         [HttpDelete("DeleteProduct/{productId}")]
         public async Task<IActionResult> DeleteProduct(int productId)
         {
-            await _productService.DeleteProductAsync(productId);
-            return NoContent();
+            var result = await _productService.DeleteProductAsync(productId);
+            if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
         }
     }
 }

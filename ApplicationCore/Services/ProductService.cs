@@ -65,11 +65,20 @@ namespace ApplicationCore.Services
             }
         }
 
-        public async Task DeleteProductAsync(int id)
+        public async Task<OperationResult> DeleteProductAsync(int id)
         {
             var product = await _productRepo.GetByIdAsync(id);
             product.IsDelete = true;
-            await _productRepo.UpdateAsync(product);
+            try
+            {
+                await _productRepo.UpdateAsync(product);
+                return new OperationResult();
+            }
+            catch (Exception ex) 
+            { 
+                _logger.LogError(ex, ex.Message );
+                return new OperationResult("刪除失敗");
+            }
         }
     }
 }
