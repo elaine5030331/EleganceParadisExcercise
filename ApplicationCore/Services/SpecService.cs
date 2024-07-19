@@ -44,5 +44,26 @@ namespace ApplicationCore.Services
                 return new OperationResult("產品規格新增失敗");
             }
         }
+
+        public async Task<OperationResult> UpdateSpecAsync(UpdateSpecDTO updateSpecDTO)
+        {
+            var spec = await _specRepository.GetByIdAsync(updateSpecDTO.SpecId);
+
+            spec.Sku = updateSpecDTO.SKU;
+            spec.UnitPrice = updateSpecDTO.UnitPrice;
+            spec.SpecName = updateSpecDTO.SpecName;
+            spec.Order = updateSpecDTO.Order;
+            spec.StockQuantity = updateSpecDTO.StockQuantity;
+
+            try
+            {
+                await _specRepository.UpdateAsync(spec);
+                return new OperationResult();
+            }
+            catch(Exception ex)
+            {
+                return new OperationResult("產品規格更新失敗");
+            }
+        }
     }
 }

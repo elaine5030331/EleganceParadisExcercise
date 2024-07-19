@@ -43,5 +43,22 @@ namespace EleganceParadisAPI.Controllers
             if (result.IsSuccess) return Created();
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 更新產品規格
+        /// </summary>
+        /// <param name="specId"></param>
+        /// <param name="specDTO"></param>
+        /// <returns></returns>
+        /// <response code ="204">產品規格新增成功</response>
+        /// <response code ="400">產品規格更新失敗</response>
+        [HttpPut("UpdateSpec/{specId}")]
+        public async Task<IActionResult> UpdateSpec(int specId, UpdateSpecDTO specDTO)
+        {
+            if (specId != specDTO.SpecId) return BadRequest();
+            var result = await _specService.UpdateSpecAsync(specDTO);
+            if(result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }
