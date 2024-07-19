@@ -17,6 +17,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserManageService, UserManageService>();
             services.AddScoped<IApplicationPasswordHasher, ApplicationPasswordHasherService>();
+            services.AddScoped<ISpecService, SpecService>();
             return services;
         }
     }
