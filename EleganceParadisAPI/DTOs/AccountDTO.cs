@@ -1,4 +1,4 @@
-﻿using EleganceParadisAPI.Models;
+﻿using ApplicationCore.Models;
 
 namespace EleganceParadisAPI.DTOs
 {

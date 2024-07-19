@@ -1,4 +1,4 @@
-﻿namespace EleganceParadisAPI.Models
+﻿namespace ApplicationCore.Models
 {
     public class OperationResult<T> where T : BaseOperationResult
     {

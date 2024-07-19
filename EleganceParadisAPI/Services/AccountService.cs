@@ -1,7 +1,7 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 using EleganceParadisAPI.DTOs;
-using EleganceParadisAPI.Models;
 using System.Text.RegularExpressions;
 
 namespace EleganceParadisAPI.Services
