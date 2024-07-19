@@ -38,7 +38,8 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> AddProduct(AddProductDTO addProductDTO)
         {
             var result = await _productService.AddProductAsync(addProductDTO);
-            return Ok(result);
+            if (result.IsSuccess) return Created();
+            return BadRequest(result.ErrorMessage);
         }
 
         /// <summary>

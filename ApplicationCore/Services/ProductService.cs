@@ -1,19 +1,23 @@
 ﻿using ApplicationCore.DTOs.ProductDTOs;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ApplicationCore.Services
 {
     public class ProductService : IProductService
     {
         private readonly IRepository<Product> _productRepo;
+        private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IRepository<Product> productRepo)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger)
         {
             _productRepo = productRepo;
+            _logger = logger;
         }
 
-        public async Task<Product> AddProductAsync(AddProductDTO addProductDTO)
+        public async Task<OperationResult> AddProductAsync(AddProductDTO addProductDTO)
         {
             var productList = await _productRepo.ListAsync(x => x.CategoryId == addProductDTO.CategoryId);
             var lastProduct = productList.OrderByDescending(p => p.Order).FirstOrDefault();
@@ -29,7 +33,16 @@ namespace ApplicationCore.Services
                 Description = addProductDTO.Description
             };
 
-            return await _productRepo.AddAsync(pruduct);
+            try
+            {
+                await _productRepo.AddAsync(pruduct);
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("新增失敗");
+            }
         }
 
         public async Task<Product> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
