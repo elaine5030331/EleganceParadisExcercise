@@ -14,6 +14,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddTransient<IProductQueryService, ProductQueryService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserManageService, UserManageService>();
             services.AddScoped<IApplicationPasswordHasher, ApplicationPasswordHasherService>();
             return services;

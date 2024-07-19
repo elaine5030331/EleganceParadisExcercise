@@ -22,10 +22,11 @@ namespace EleganceParadisAPI.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDTO loginInfo)
         {
-            var IsUserValid = await _userManageService.AuthenticateUser(loginInfo.UserName, loginInfo.Password);
-            if (IsUserValid)
+            var isUserValid = await _userManageService.AuthenticateUser(loginInfo.UserName, loginInfo.Password);
+            if (isUserValid)
             {
                 var roleList = new List<string>() { "Admin", "User"};
+                //return Ok(_jWT.GenerateToken(loginInfo.UserName, roleList));
                 return Ok(_jWT.GenerateToken(loginInfo.UserName, roleList));
             }
             return BadRequest("帳號或密碼有誤，請重新輸入");
