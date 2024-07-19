@@ -7,5 +7,6 @@ namespace ApplicationCore.Interfaces
     {
         public Task<OperationResult> AddSpecAsync(AddSpecDTO specDTO);
         public Task<OperationResult> UpdateSpecAsync(UpdateSpecDTO updateSpecDTO);
+        public Task<OperationResult> DeleteSpecAsync(int specId);
     }
 }

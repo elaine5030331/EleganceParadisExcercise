@@ -65,5 +65,20 @@ namespace ApplicationCore.Services
                 return new OperationResult("產品規格更新失敗");
             }
         }
+
+        public async Task<OperationResult> DeleteSpecAsync(int specId)
+        {
+            var spec = await _specRepository.GetByIdAsync(specId);
+            try
+            {
+                await _specRepository.DeleteAsync(spec);
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,ex.Message);
+                return new OperationResult("產品規格刪除失敗");
+            }
+        }
     }
 }

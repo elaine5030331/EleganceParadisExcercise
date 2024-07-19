@@ -60,5 +60,20 @@ namespace EleganceParadisAPI.Controllers
             if(result.IsSuccess) return NoContent();
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 刪除產品規格
+        /// </summary>
+        /// <param name="specId"></param>
+        /// <returns></returns>
+        /// <response code ="204">刪除成功</response>
+        /// <response code ="400">刪除失敗</response>
+        [HttpDelete("DeleteSpec/{specId}")]
+        public async Task<IActionResult> DeleteSpec(int specId)
+        {
+            var result = await _specService.DeleteSpecAsync(specId);
+            if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }
