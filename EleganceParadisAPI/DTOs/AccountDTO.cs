@@ -13,14 +13,14 @@ namespace EleganceParadisAPI.DTOs
 
     public class CreateAccountResultDTO : BaseOperationResult
     {
-        public int UserId { get; set; }
+        public int AccountId { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
     }
 
     public class GetCustomerInfoDTO
     {
-        public int CustomerId { get; set; }
+        public int AccountId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Mobile { get; set; }
@@ -28,7 +28,7 @@ namespace EleganceParadisAPI.DTOs
 
     public class UpdateCustomerInfo
     {
-        public int CustomerId { get; set; }
+        public int AccountId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Mobile { get; set; }
@@ -36,7 +36,7 @@ namespace EleganceParadisAPI.DTOs
 
     public class UpdateCustomerResult : BaseOperationResult
     {
-        public int CustomerId { get; set; }
+        public int AccountId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Mobile { get; set; }

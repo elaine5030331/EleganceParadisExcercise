@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EleganceParadisAPI.Helpers
 {
-    public class JWTHelper
+    public partial class JWTHelper
     {
         private readonly IConfiguration _configuration;
         public JWTHelper(IConfiguration configuration)
@@ -13,24 +13,26 @@ namespace EleganceParadisAPI.Helpers
             _configuration = configuration;
         }
          
-        public JWTDTO GenerateToken(string userName, IEnumerable<string> roles, int expireMinutes = 60)
+        public JWTDTO GenerateToken(GenerateTokenDTO generateTokenDTO)
         {
             var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
             var signKey = _configuration.GetValue<string>("JwtSettings:SignKey");
 
             //將所需資訊(使用者相關的資料)加入Claim(聲明)中
             var claims = new List<Claim>();
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userName));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, generateTokenDTO.Email));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            //新增角色
-            if (roles != null)
-            {
-                foreach (var role in roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.PrimarySid, generateTokenDTO.AccountId.ToString()));
 
-                }
-            }
+            ////新增角色
+            //if (generateTokenDTO.Roles != null)
+            //{
+            //    foreach (var role in generateTokenDTO.Roles)
+            //    {
+            //        claims.Add(new Claim(ClaimTypes.Role, role));
+
+            //    }
+            //}
 
             //宣告身分識別參數
             var userClaimsIdentity = new ClaimsIdentity(claims);
@@ -43,7 +45,7 @@ namespace EleganceParadisAPI.Helpers
             {
                 Issuer = issuer,
                 Subject = userClaimsIdentity,
-                Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
+                Expires = DateTime.UtcNow.AddMinutes(generateTokenDTO.ExpireMinutes),
                 SigningCredentials = signingCretentials
             };
 
@@ -59,11 +61,11 @@ namespace EleganceParadisAPI.Helpers
             };
 
         }
+    }
 
-        public class JWTDTO
-        {
-            public string Token { get; set; }
-            public long ExpireTime { get; set; }
-        }
+    public class JWTDTO
+    {
+        public string Token { get; set; }
+        public long ExpireTime { get; set; }
     }
 }

@@ -68,7 +68,7 @@ namespace EleganceParadisAPI.Services
             {
                 Email = registInfo.Email,
                 Name = registInfo.Name,
-                UserId = account.Id
+                AccountId = account.Id
             };
             return new OperationResult<CreateAccountResultDTO>(result);
 
@@ -80,7 +80,7 @@ namespace EleganceParadisAPI.Services
             if (result == null) return default;
             return new GetCustomerInfoDTO()
             {
-                CustomerId = customertId,
+                AccountId = customertId,
                 Email = result.Email,
                 Name = result.Name,
                 Mobile = result.Mobile
@@ -123,7 +123,7 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<UpdateCustomerResult>("手機號格式有誤");
             }
-            var customer = await _customerRepo.GetByIdAsync(customerInfo.CustomerId);
+            var customer = await _customerRepo.GetByIdAsync(customerInfo.AccountId);
 
             if (customer == null) return new OperationResult<UpdateCustomerResult>("查無此人");
 
@@ -142,7 +142,7 @@ namespace EleganceParadisAPI.Services
             var updatedInfo = await _customerRepo.UpdateAsync(customer);
             var updateResult = new UpdateCustomerResult
             {
-                CustomerId = updatedInfo.Id,
+                AccountId = updatedInfo.Id,
                 Email = updatedInfo.Email,
                 Name = updatedInfo.Name,
                 Mobile = updatedInfo.Mobile

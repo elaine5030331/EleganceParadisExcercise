@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ApplicationCore.Interfaces.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace ApplicationCore.Interfaces
 {
     public interface IUserManageService
     {
-        public Task<bool> AuthenticateUser(string email, string password);
+        public Task<AuthenticateDTO> AuthenticateUser(string email, string password);
     }
 }
