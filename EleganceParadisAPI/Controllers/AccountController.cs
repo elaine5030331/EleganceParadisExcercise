@@ -47,7 +47,7 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="id">accountId(可不帶)</param>
         /// <returns></returns>
-        [HttpGet("GetAccount")]
+        [HttpGet("GetAccount/{id?}")]
         public async Task<IActionResult> GetAccount(int? id)
         {
             int accountId;
