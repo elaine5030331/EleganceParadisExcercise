@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.DTOs.ProductDTOs;
+using ApplicationCore.Entities;
 using Dapper;
 using EleganceParadisAPI.Services;
 using System.Data;
@@ -17,29 +18,35 @@ namespace Infrastructure.Data.Services
         public async Task<List<GetProductListDTO>> GetProducts(int categoryId)
         {
             var parameter = new { CategoryId = categoryId };
-            var sql = @"WITH MinUnitPrice_CTE(ProductId, MinUnitPrice)
-                        AS(
-	                        SELECT
-		                        ProductId,
-		                        MIN(UnitPrice)
-	                        FROM Specs
-	                        GROUP BY ProductId
-                        )
-                        SELECT 
-                            Products.Id AS ProductId,
-                            Categories.Name AS CategoryName,
-                            ProductName,
-                            MinUnitPrice_CTE.MinUnitPrice AS UnitPrice,
-                            ProductImages.URL AS ProductImageUrl
-                        FROM Products 
-                        JOIN MinUnitPrice_CTE ON MinUnitPrice_CTE.ProductId = Products.Id
-                        JOIN Categories ON Categories.Id = Products.CategoryId 
-                        left JOIN ProductImages ON Products.Id = ProductImages.ProductId 
-                        WHERE Categories.Id = @CategoryId
-                        AND ProductImages.[Order] = 1
-                        ORDER BY Categories.[Order]";
+            var getProductsQuerySql = @"WITH MinUnitPrice_CTE(ProductId, MinUnitPrice)
+                                        AS(
+	                                        SELECT
+		                                        ProductId,
+		                                        MIN(UnitPrice)
+	                                        FROM Specs
+	                                        GROUP BY ProductId
+                                        )
+                                        SELECT 
+                                            Products.Id AS ProductId,
+                                            Categories.Name AS CategoryName,
+                                            ProductName,
+                                            MinUnitPrice_CTE.MinUnitPrice AS UnitPrice,
+                                            (
+		                                        SELECT TOP 1
+			                                        ProductImages.URL
+		                                        FROM ProductImages
+		                                        WHERE ProductImages.ProductId = Products.Id
+		                                        ORDER BY ProductImages.[Order]
+	                                        ) AS ProductImageUrl
+                                        FROM Products 
+                                        JOIN MinUnitPrice_CTE ON MinUnitPrice_CTE.ProductId = Products.Id
+                                        JOIN Categories ON Categories.Id = Products.CategoryId 
+                                        WHERE Categories.Id = @CategoryId
+                                        AND Products.IsDelete = 0
+                                        AND Products.Enable = 1
+                                        ORDER BY Products.[Order], Products.CreateAt";
 
-            return (await _connection.QueryAsync<GetProductListDTO>(sql, parameter)).ToList();
+            return (await _connection.QueryAsync<GetProductListDTO>(getProductsQuerySql, parameter)).ToList();
         }
 
         public async Task<ProductDTO> GetProductById(int productId)
@@ -61,7 +68,8 @@ namespace Infrastructure.Data.Services
                         JOIN Specs ON Specs.ProductId = Products.Id
                         JOIN Categories ON Categories.Id = Products.CategoryId
                         WHERE Products.Id = @ProductId
-                        AND Products.IsDelete = 0";
+                        AND Products.IsDelete = 0
+                        ORDER BY Products.[Order], Products.CreateAt, SpecOrder, Specs.CreateAt";
 
             var queryResult = (await _connection.QueryAsync<ProductQueryResultDTO>(sql, parameter)).ToList();
 
@@ -72,7 +80,8 @@ namespace Infrastructure.Data.Services
 	                                        URL AS ProductImageUrl,
 	                                        [Order] AS ProductImageOrder
                                         FROM ProductImages
-                                        WHERE ProductId = @ProductId";
+                                        WHERE ProductId = @ProductId
+                                        ORDER BY ProductImageOrder";
             var productImagesQueryResult = (await _connection.QueryAsync<ProductImageDTO>(getProductImagesSQL, parameter)).ToList();
 
             var product = queryResult[0];
