@@ -16,6 +16,7 @@ namespace EleganceParadisAPI
             // Add services to the container.
 
             Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
+            Infrastructure.Dependencies.ConfigureCloudinaryService(builder.Configuration, builder.Services);
             //builder.Services.AddDbContext<EleganceParadisContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("EleganceParadisDB")));
 
             builder.Services.AddControllers();
