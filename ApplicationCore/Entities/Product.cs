@@ -27,6 +27,8 @@ public partial class Product
 
     public string? Description { get; set; }
 
+    public DateTimeOffset CreateAt { get; set; }
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();

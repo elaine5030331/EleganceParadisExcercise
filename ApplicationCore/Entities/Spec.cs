@@ -22,6 +22,8 @@ public partial class Spec
 
     public int? StockQuantity { get; set; }
 
+    public DateTimeOffset CreateAt { get; set; }
+
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual Product Product { get; set; } = null!;
