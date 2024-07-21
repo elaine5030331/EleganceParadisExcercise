@@ -30,7 +30,6 @@ namespace EleganceParadisAPI.Controllers
         ///        "sku": 產品類別 + 產品名稱 + 產品規格
         ///        "unitPrice": 單價
         ///        "specName": 產品規格名稱(ex：50ml, 75ml, 1 peice)
-        ///        "order": 排序
         ///        "stockQuantity": 庫存量
         ///     }
         /// </remarks>

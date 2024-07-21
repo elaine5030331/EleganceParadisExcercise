@@ -29,8 +29,6 @@ namespace EleganceParadisAPI.Controllers
         ///        "categoryId": 類別ID(ex：香水、隨身噴香霧、沐浴與身體保養),
         ///        "spu": "產品編號",
         ///        "productName": "產品名稱",
-        ///        "enable": 是否上架
-        ///        "order": 產品顯示於畫面的順序,
         ///        "description": "產品描述"
         ///     }
         /// </remarks>

@@ -19,18 +19,24 @@ namespace ApplicationCore.Services
 
         public async Task<OperationResult> AddProductAsync(AddProductDTO addProductDTO)
         {
-            var productList = await _productRepo.ListAsync(x => x.CategoryId == addProductDTO.CategoryId);
-            var lastProduct = productList.OrderByDescending(p => p.Order).FirstOrDefault();
-            var lastOrder = lastProduct == null ? 0 : (lastProduct.Order + 1);
             var pruduct = new Product
             {
                 CategoryId = addProductDTO.CategoryId,
                 Spu = addProductDTO.SPU,
                 ProductName = addProductDTO.ProductName,
-                Enable = addProductDTO.Enable,
+                Enable = false,
                 IsDelete = false,
-                Order = lastOrder,
-                Description = addProductDTO.Description
+                Description = addProductDTO.Description,
+                CreateAt = DateTimeOffset.UtcNow,
+                Specs = new List<Spec> 
+                {
+                    new Spec
+                    {
+                        Sku = string.Empty,
+                        SpecName = string.Empty,
+                        CreateAt = DateTimeOffset.UtcNow
+                    } 
+                }
             };
 
             try

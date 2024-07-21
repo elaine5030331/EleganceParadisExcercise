@@ -19,18 +19,14 @@ namespace ApplicationCore.Services
 
         public async Task<OperationResult> AddSpecAsync(AddSpecDTO specDTO)
         {
-            var specList = await _specRepository.ListAsync(s => s.ProductId == specDTO.ProductId);
-            var lastSpec = specList.OrderByDescending(s => s.Order).FirstOrDefault();
-            var lastSpecOrder = lastSpec == null ? 1 : (lastSpec.Order + 1);
-            
             var spec = new Spec
             {
                 ProductId = specDTO.ProductId,
                 Sku = specDTO.SKU,
                 UnitPrice = specDTO.UnitPrice,
                 SpecName = specDTO.SpecName,
-                Order = lastSpecOrder,
-                StockQuantity = specDTO.StockQuantity
+                StockQuantity = specDTO.StockQuantity,
+                CreateAt = DateTimeOffset.UtcNow
             };
 
             try
