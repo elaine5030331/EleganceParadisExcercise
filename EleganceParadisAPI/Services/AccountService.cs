@@ -51,14 +51,14 @@ namespace EleganceParadisAPI.Services
 
             var account = new Account
             {
-                Account1 = registInfo.Email,
+                Account1 = registInfo.Email.ToLower(),
                 Password = _applicationPasswordHasher.HashPassword(registInfo.ConfirmedPassword),
                 CreateAt = DateTimeOffset.UtcNow,
                 Status = AccountStatus.Unverified,
                 Customer = new Customer
                 {
                     Name = registInfo.Name,
-                    Email = registInfo.Email,
+                    Email = registInfo.Email.ToLower(),
                     Mobile = registInfo.Mobile
                 }
             };
@@ -89,13 +89,13 @@ namespace EleganceParadisAPI.Services
 
         private async Task<bool> IsEmailExist(string email)
         {
-            return await _customerRepo.AnyAsync(x => x.Email == email);
+            return await _customerRepo.AnyAsync(x => x.Email.ToLower() == email.ToLower());
         }
 
         private async Task<bool> IsEmailExist(Customer customer, string email)
         {
             if (customer.Email.ToLower() == email.ToLower()) return false;
-            return await _customerRepo.AnyAsync(x => x.Email == email);
+            return await IsEmailExist(email);
         }
 
         private async Task<bool> IsMobileExist(string mobile)
@@ -106,7 +106,7 @@ namespace EleganceParadisAPI.Services
         private async Task<bool> IsMobileExist(Customer customer, string mobile)
         {
             if (customer.Mobile == mobile) return false;
-            return await _customerRepo.AnyAsync(_ => _.Mobile == mobile);
+            return await IsMobileExist(mobile);
         }
 
         public async Task<OperationResult<UpdateCustomerResult>> UpdateCustomerInfo(UpdateCustomerInfo customerInfo)
@@ -135,7 +135,7 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<UpdateCustomerResult>("此手機號碼已註冊過");
             }
-            customer.Email = customerInfo.Email;
+            customer.Email = customerInfo.Email.ToLower();
             customer.Mobile = customerInfo.Mobile;
             customer.Name = customerInfo.Name;
 
