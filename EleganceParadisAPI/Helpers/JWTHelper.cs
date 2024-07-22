@@ -56,6 +56,7 @@ namespace EleganceParadisAPI.Helpers
 
             return new JWTDTO()
             {
+                AccountId = generateTokenDTO.AccountId,
                 Token = serializeToken,
                 ExpireTime = new DateTimeOffset(tokenDescriptor.Expires.Value).ToUnixTimeSeconds()
             };
@@ -65,6 +66,7 @@ namespace EleganceParadisAPI.Helpers
 
     public class JWTDTO
     {
+        public int AccountId { get; set; }
         public string Token { get; set; }
         public long ExpireTime { get; set; }
     }
