@@ -28,7 +28,7 @@ namespace EleganceParadisAPI.Controllers
                 return Ok(_jWT.GenerateToken(new GenerateTokenDTO 
                                                 { AccountId = authRes.AccountId,
                                                   Email = loginInfo.Email,
-                                                  ExpireMinutes = 720
+                                                  ExpireMinutes = 60 * 24 * 7
                                                 }));
             }
             return BadRequest("帳號或密碼有誤，請重新輸入");
