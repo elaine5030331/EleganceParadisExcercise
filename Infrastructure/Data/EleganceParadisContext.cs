@@ -22,8 +22,6 @@ public partial class EleganceParadisContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Customer> Customers { get; set; }
-
     public virtual DbSet<Format> Formats { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -40,16 +38,16 @@ public partial class EleganceParadisContext : DbContext
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.Property(e => e.Account1).HasColumnName("Account");
+            entity.Property(e => e.Mobile).HasMaxLength(256);
             entity.Property(e => e.Status).HasComment("EX：黑名單、是否被驗證");
         });
 
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasOne(d => d.Customer).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.CustomerId)
+            entity.HasOne(d => d.Account).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Carts_Customers");
+                .HasConstraintName("FK_Carts_Accounts");
 
             entity.HasOne(d => d.Spec).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.SpecId)
@@ -66,26 +64,15 @@ public partial class EleganceParadisContext : DbContext
                 .HasConstraintName("FK_Categories_Categories");
         });
 
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Mobile).HasMaxLength(256);
-
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Customer)
-                .HasForeignKey<Customer>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Customers_Accounts");
-        });
-
         modelBuilder.Entity<Order>(entity =>
         {
             entity.Property(e => e.Purchaser).HasMaxLength(256);
             entity.Property(e => e.PurchaserTel).HasMaxLength(50);
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.CustomerId)
+            entity.HasOne(d => d.Account).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Orders_Customers");
+                .HasConstraintName("FK_Orders_Accounts");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>

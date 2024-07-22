@@ -64,7 +64,7 @@ namespace EleganceParadisAPI.Controllers
                 accountId = id.Value;
             }
 
-            var result = await _accountService.GetCustomerInfo(accountId);
+            var result = await _accountService.GetAccountInfo(accountId);
             if (result == null) return BadRequest("查無此人");
             return Ok(result);
         }
@@ -72,14 +72,14 @@ namespace EleganceParadisAPI.Controllers
         /// <summary>
         /// 更新個人資料
         /// </summary>
-        /// <param name="customerInfo"></param>
+        /// <param name="accountInfo"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut("UpdateCustomerInfo/{id}")]
-        public async Task<IActionResult> UpdateCustomerInfo(int id, UpdateCustomerInfo customerInfo)
+        public async Task<IActionResult> UpdateAccountInfo(int id, UpdateAccountInfo accountInfo)
         {
-            if (id != customerInfo.AccountId) return BadRequest();
-            var result = await _accountService.UpdateCustomerInfo(customerInfo);
+            if (id != accountInfo.AccountId) return BadRequest();
+            var result = await _accountService.UpdateAccountInfo(accountInfo);
             if (result.IsSuccess) return Ok(result.ResultDTO);
             else return BadRequest(result.ErrorMessage);
         }

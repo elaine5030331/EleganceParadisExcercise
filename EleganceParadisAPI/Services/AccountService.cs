@@ -3,22 +3,21 @@ using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using EleganceParadisAPI.DTOs;
 using System.Text.RegularExpressions;
+using static ApplicationCore.Entities.Account;
 
 namespace EleganceParadisAPI.Services
 {
     public class AccountService
     {
         private readonly IRepository<Account> _accountRepo;
-        private readonly IRepository<Customer> _customerRepo;
         private readonly IApplicationPasswordHasher _applicationPasswordHasher;
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
         private const string mobilePattern = @"^09\d{8}$";
         private const string emailPattern = @".*@.*\..*";
 
-        public AccountService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo, IApplicationPasswordHasher applicationPasswordHasher)
+        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher)
         {
             _accountRepo = accountRepo;
-            _customerRepo = customerRepo;
             _applicationPasswordHasher = applicationPasswordHasher;
         }
 
@@ -51,16 +50,12 @@ namespace EleganceParadisAPI.Services
 
             var account = new Account
             {
-                Account1 = registInfo.Email.ToLower(),
+                Name = registInfo.Name,
+                Email = registInfo.Email.ToLower(),
+                Mobile = registInfo.Mobile,
                 Password = _applicationPasswordHasher.HashPassword(registInfo.ConfirmedPassword),
                 CreateAt = DateTimeOffset.UtcNow,
-                Status = AccountStatus.Unverified,
-                Customer = new Customer
-                {
-                    Name = registInfo.Name,
-                    Email = registInfo.Email.ToLower(),
-                    Mobile = registInfo.Mobile
-                }
+                Status = AccountStatus.Unverified
             };
             _accountRepo.Add(account);
 
@@ -74,13 +69,13 @@ namespace EleganceParadisAPI.Services
 
         }
 
-        public async Task<GetCustomerInfoDTO> GetCustomerInfo(int customertId)
+        public async Task<GetAccountInfoDTO> GetAccountInfo(int accountId)
         {
-            var result = await _customerRepo.GetByIdAsync(customertId);
+            var result = await _accountRepo.GetByIdAsync(accountId);
             if (result == null) return default;
-            return new GetCustomerInfoDTO()
+            return new GetAccountInfoDTO()
             {
-                AccountId = customertId,
+                AccountId = accountId,
                 Email = result.Email,
                 Name = result.Name,
                 Mobile = result.Mobile
@@ -89,91 +84,91 @@ namespace EleganceParadisAPI.Services
 
         private async Task<bool> IsEmailExist(string email)
         {
-            return await _customerRepo.AnyAsync(x => x.Email.ToLower() == email.ToLower());
+            return await _accountRepo.AnyAsync(x => x.Email.ToLower() == email.ToLower());
         }
 
-        private async Task<bool> IsEmailExist(Customer customer, string email)
+        private async Task<bool> IsEmailExist(Account account, string email)
         {
-            if (customer.Email.ToLower() == email.ToLower()) return false;
+            if (account.Email.ToLower() == email.ToLower()) return false;
             return await IsEmailExist(email);
         }
 
         private async Task<bool> IsMobileExist(string mobile)
         {
-            return await _customerRepo.AnyAsync(x => x.Mobile == mobile);
+            return await _accountRepo.AnyAsync(x => x.Mobile == mobile);
         }
 
-        private async Task<bool> IsMobileExist(Customer customer, string mobile)
+        private async Task<bool> IsMobileExist(Account account, string mobile)
         {
-            if (customer.Mobile == mobile) return false;
+            if (account.Mobile == mobile) return false;
             return await IsMobileExist(mobile);
         }
 
-        public async Task<OperationResult<UpdateCustomerResult>> UpdateCustomerInfo(UpdateCustomerInfo customerInfo)
+        public async Task<OperationResult<UpdateAcoountInfoResult>> UpdateAccountInfo(UpdateAccountInfo accountInfo)
         {
-            if (string.IsNullOrEmpty(customerInfo.Name))
+            if (string.IsNullOrEmpty(accountInfo.Name))
             {
-                return new OperationResult<UpdateCustomerResult>("請輸入名字");
+                return new OperationResult<UpdateAcoountInfoResult>("請輸入名字");
             }
-            if (!Regex.IsMatch(customerInfo.Email, emailPattern))
+            if (!Regex.IsMatch(accountInfo.Email, emailPattern))
             {
-                return new OperationResult<UpdateCustomerResult>("電子信箱格式有誤");
+                return new OperationResult<UpdateAcoountInfoResult>("電子信箱格式有誤");
             }
-            if (!Regex.IsMatch(customerInfo.Mobile, mobilePattern))
+            if (!Regex.IsMatch(accountInfo.Mobile, mobilePattern))
             {
-                return new OperationResult<UpdateCustomerResult>("手機號格式有誤");
+                return new OperationResult<UpdateAcoountInfoResult>("手機號格式有誤");
             }
-            var customer = await _customerRepo.GetByIdAsync(customerInfo.AccountId);
+            var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
 
-            if (customer == null) return new OperationResult<UpdateCustomerResult>("查無此人");
+            if (account == null) return new OperationResult<UpdateAcoountInfoResult>("查無此人");
 
-            if (await IsEmailExist(customer, customerInfo.Email))
+            if (await IsEmailExist(account, accountInfo.Email))
             {
-                return new OperationResult<UpdateCustomerResult>("此電子信箱已註冊過");
+                return new OperationResult<UpdateAcoountInfoResult>("此電子信箱已註冊過");
             }
-            if (await IsMobileExist(customer, customerInfo.Mobile))
+            if (await IsMobileExist(account, accountInfo.Mobile))
             {
-                return new OperationResult<UpdateCustomerResult>("此手機號碼已註冊過");
+                return new OperationResult<UpdateAcoountInfoResult>("此手機號碼已註冊過");
             }
-            customer.Email = customerInfo.Email.ToLower();
-            customer.Mobile = customerInfo.Mobile;
-            customer.Name = customerInfo.Name;
+            account.Email = accountInfo.Email.ToLower();
+            account.Mobile = accountInfo.Mobile;
+            account.Name = accountInfo.Name;
 
-            var updatedInfo = await _customerRepo.UpdateAsync(customer);
-            var updateResult = new UpdateCustomerResult
+            var updatedInfo = await _accountRepo.UpdateAsync(account);
+            var updateResult = new UpdateAcoountInfoResult
             {
                 AccountId = updatedInfo.Id,
                 Email = updatedInfo.Email,
                 Name = updatedInfo.Name,
                 Mobile = updatedInfo.Mobile
             };
-            return new OperationResult<UpdateCustomerResult>(updateResult);
+            return new OperationResult<UpdateAcoountInfoResult>(updateResult);
         }
 
-        public async Task<OperationResult<UpdateAccountResult>> UpdateAccountPassword(UpdateAccountPassword accountInfo)
+        public async Task<OperationResult<UpdateAccountPasswordResult>> UpdateAccountPassword(UpdateAccountPassword accountInfo)
         {
             if (accountInfo.OldPassword == accountInfo.NewPassword)
-                return new OperationResult<UpdateAccountResult>("新密碼與舊密碼不可相同");
+                return new OperationResult<UpdateAccountPasswordResult>("新密碼與舊密碼不可相同");
 
             if (!Regex.IsMatch(accountInfo.NewPassword, passwordPattern))
-                return new OperationResult<UpdateAccountResult>("密碼格式有誤");
+                return new OperationResult<UpdateAccountPasswordResult>("密碼格式有誤");
 
             var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
 
             if (account == null) 
-                return new OperationResult<UpdateAccountResult>("查無此人");
+                return new OperationResult<UpdateAccountPasswordResult>("查無此人");
 
             if (!_applicationPasswordHasher.VerifyPassword(account.Password, accountInfo.OldPassword))
-                return new OperationResult<UpdateAccountResult>("舊密碼有誤");
+                return new OperationResult<UpdateAccountPasswordResult>("舊密碼有誤");
 
             account.Password = _applicationPasswordHasher.HashPassword(accountInfo.NewPassword);
 
             var updatedInfo = await _accountRepo.UpdateAsync(account);
-            var updatedResult = new UpdateAccountResult
+            var updatedResult = new UpdateAccountPasswordResult
             {
                 AccountId = accountInfo.AccountId,
             };
-            return new OperationResult<UpdateAccountResult>(updatedResult);
+            return new OperationResult<UpdateAccountPasswordResult>(updatedResult);
         }
 
     }

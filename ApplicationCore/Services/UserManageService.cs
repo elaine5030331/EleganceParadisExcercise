@@ -12,13 +12,11 @@ namespace ApplicationCore.Services
     public class UserManageService : IUserManageService
     {
         private readonly IRepository<Account> _accountRepo;
-        private readonly IRepository<Customer> _customerRepo;
         private readonly IApplicationPasswordHasher _applicationPasswordHasher;
 
-        public UserManageService(IRepository<Account> accountRepo, IRepository<Customer> customerRepo, IApplicationPasswordHasher applicationPasswordHasher)
+        public UserManageService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher)
         {
             _accountRepo = accountRepo;
-            _customerRepo = customerRepo;
             _applicationPasswordHasher = applicationPasswordHasher;
         }
 
@@ -28,9 +26,7 @@ namespace ApplicationCore.Services
             {
                 AccountId = -1
             };
-            var customer = await _customerRepo.FirstOrDefaultAsync(e => e.Email == email);
-            if (customer == null) return result;
-            var account = await _accountRepo.FirstOrDefaultAsync(x => x.Id == customer.Id);
+            var account = await _accountRepo.FirstOrDefaultAsync(x => x.Email == email.ToLower());
             if (account == null) return result;
             if(_applicationPasswordHasher.VerifyPassword(account.Password, password))
             {

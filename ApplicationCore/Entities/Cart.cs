@@ -9,11 +9,11 @@ public partial class Cart
 
     public int SpecId { get; set; }
 
-    public int CustomerId { get; set; }
+    public int AccountId { get; set; }
 
     public int Quantity { get; set; }
 
-    public virtual Customer Customer { get; set; } = null!;
+    public virtual Account Account { get; set; } = null!;
 
     public virtual Spec Spec { get; set; } = null!;
 }
