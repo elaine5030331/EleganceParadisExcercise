@@ -1,4 +1,5 @@
 ﻿using EleganceParadisAPI.DTOs;
+using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -51,13 +52,13 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> GetAccount(int? id)
         {
             int accountId;
-            if (!id.HasValue)
-            {
-                var claim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
-                if (claim == null) return BadRequest("查無此人");
+           
 
-                if (!int.TryParse(claim.Value, out accountId))
-                    return BadRequest("查無此人");
+            if (!id.HasValue)
+            {  
+                var getAccountIdRes = User.GetAccountId();
+                if (getAccountIdRes == null) return BadRequest("查無此人");
+                accountId = getAccountIdRes.Value;
             }
             else
             {
