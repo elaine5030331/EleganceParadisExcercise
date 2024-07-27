@@ -2,7 +2,7 @@
 {
     public class DeleteCartItemDTO
     {
-        public int accountId { get; set; }
+        public int AccountId { get; set; }
         public int CartId { get; set; }
     }
 }

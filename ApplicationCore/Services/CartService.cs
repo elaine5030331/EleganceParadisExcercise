@@ -156,9 +156,14 @@ namespace ApplicationCore.Services
             }
         }
 
+        /// <summary>
+        /// 刪除購物車資料
+        /// </summary>
+        /// <param name="deleteCartItemDTO"></param>
+        /// <returns></returns>
         public async Task<OperationResult<CartDTO>> DeleteCartItemAsync(DeleteCartItemDTO deleteCartItemDTO)
         {
-            var cartList = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.accountId);
+            var cartList = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.AccountId);
             var cartItem = cartList.FirstOrDefault(c => c.Id == deleteCartItemDTO.CartId);
             if (cartItem == null)
             {
@@ -166,7 +171,7 @@ namespace ApplicationCore.Services
                 {
                     IsSuccess = false,
                     ErrorMessage = "找不到對應的cartId",
-                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(cartList))
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.AccountId, await GetCurrentCartItemsAsync(cartList))
                 };
                 return result;
             }
@@ -174,11 +179,11 @@ namespace ApplicationCore.Services
             try
             {
                 await _cartRepository.DeleteAsync(cartItem);
-                var currentCartItems = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.accountId);
+                var currentCartItems = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.AccountId);
                 var result = new OperationResult<CartDTO>()
                 {
                     IsSuccess = true,
-                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(currentCartItems))
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.AccountId, await GetCurrentCartItemsAsync(currentCartItems))
                 };
                 return result;
             }
@@ -189,7 +194,7 @@ namespace ApplicationCore.Services
                 {
                     IsSuccess = false,
                     ErrorMessage = "購物車刪除失敗",
-                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(cartList))
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.AccountId, await GetCurrentCartItemsAsync(cartList))
                 };
                 return result;
             }

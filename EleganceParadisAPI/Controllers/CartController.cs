@@ -28,9 +28,9 @@ namespace EleganceParadisAPI.Controllers
         /// <remarks>
         /// Sample request:<br/>
         ///     {
-        ///        "AccountId": 1, 
-        ///        "SpecId": 1(商品規格ID),
-        ///        "Quantity": 3(購物數量)"
+        ///        "accountId": 1, 
+        ///        "specId": 1(商品規格ID),
+        ///        "quantity": 3(購物數量)"
         ///     }
         /// </remarks>
         /// <response code ="400">
@@ -87,15 +87,16 @@ namespace EleganceParadisAPI.Controllers
         /// <remarks>
         /// Sample request:<br/>
         ///     {
-        ///        "AccountId": 1, 
-        ///        "CartId": 1(購物車ID),
-        ///        "SpecId": 1(商品規格ID),
-        ///        "Quantity": 3(購物數量)"
+        ///        "accountId": 1, 
+        ///        "cartId": 1(購物車ID),
+        ///        "specId": 1(商品規格ID),
+        ///        "quantity": 3(購物數量)"
         ///     }
         /// </remarks>
         /// <response code ="400">
-        ///     1.找不到AccountId對應的用戶 <br/>
-        ///     2.更新購物車失敗(僅會回傳購物車原本的資料)
+        ///     1.找不到這個用戶 <br/>
+        ///     2.找不到AccountId對應的用戶<br/>
+        ///     3.加入購物車失敗(僅會回傳購物車原本的資料)
         /// </response>
         [HttpPatch("UpdateCartItems")]
         public async Task<IActionResult> UpdateCartItems(UpdateCartItemDTO updateCartItemDTO)
@@ -117,8 +118,8 @@ namespace EleganceParadisAPI.Controllers
         /// <remarks>
         /// Sample request:<br/>
         ///     {
-        ///        "AccountId": 1, 
-        ///        "CartId": 1(購物車ID)
+        ///        "accountId": 1, 
+        ///        "cartId": 1(購物車ID)
         ///     }
         /// </remarks>
         /// <response code ="400">
@@ -131,7 +132,7 @@ namespace EleganceParadisAPI.Controllers
         {
             var accountId = User.GetAccountId();
             if (accountId == null) return BadRequest("查無此人");
-            if (accountId != deleteCartItemDTO.accountId) return BadRequest("AccountId 不符");
+            if (accountId != deleteCartItemDTO.AccountId) return BadRequest("AccountId 不符");
 
             var result = await _cartService.DeleteCartItemAsync(deleteCartItemDTO);
             if (result.IsSuccess) return Ok(result.ResultDTO);
