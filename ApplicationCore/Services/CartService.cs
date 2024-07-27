@@ -153,6 +153,45 @@ namespace ApplicationCore.Services
             }
         }
 
+        public async Task<OperationResult<CartDTO>> DeleteCartItemAsync(DeleteCartItemDTO deleteCartItemDTO)
+        {
+            var cartList = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.accountId);
+            var cartItem = cartList.FirstOrDefault(c => c.Id == deleteCartItemDTO.CartId);
+            if (cartItem == null)
+            {
+                var result = new OperationResult<CartDTO>()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "找不到對應的cartId",
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(cartList))
+                };
+                return result;
+            }
+
+            try
+            {
+                await _cartRepository.DeleteAsync(cartItem);
+                var currentCartItems = await _cartRepository.ListAsync(c => c.AccountId == deleteCartItemDTO.accountId);
+                var result = new OperationResult<CartDTO>()
+                {
+                    IsSuccess = true,
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(currentCartItems))
+                };
+                return result;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                var result = new OperationResult<CartDTO>
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "購物車刪除失敗",
+                    ResultDTO = GetCartDTO(deleteCartItemDTO.accountId, await GetCurrentCartItemsAsync(cartList))
+                };
+                return result;
+            }
+        }
+
         /// <summary>
         /// 取得CartDTO資料，將需要回傳的資料組起來
         /// </summary>
