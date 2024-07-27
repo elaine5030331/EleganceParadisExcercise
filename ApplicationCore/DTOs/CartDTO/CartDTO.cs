@@ -30,6 +30,7 @@ namespace ApplicationCore.DTOs.CartDTO
 
     public class CartItem
     {
+        public int CartId { get; set; }
         public int SpecId { get; set; }
         public string CategoryName { get; set; }
         public string ProductName { get; set; }

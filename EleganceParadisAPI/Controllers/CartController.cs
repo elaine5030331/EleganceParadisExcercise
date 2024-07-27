@@ -88,6 +88,7 @@ namespace EleganceParadisAPI.Controllers
         /// Sample request:<br/>
         ///     {
         ///        "AccountId": 1, 
+        ///        "CartId": 1(購物車ID),
         ///        "SpecId": 1(商品規格ID),
         ///        "Quantity": 3(購物數量)"
         ///     }
@@ -103,7 +104,7 @@ namespace EleganceParadisAPI.Controllers
             if (accountId == null) return BadRequest("查無此人");
             if (accountId != updateCartItemDTO.AccountId) return BadRequest("AccountId 不符");
 
-            var result = await _cartService.UpdateCartItemsAsync(updateCartItemDTO.AccountId, updateCartItemDTO);
+            var result = await _cartService.UpdateCartItemsAsync(updateCartItemDTO);
             if (result.IsSuccess) return Ok(result.ResultDTO);
             return result.GetBadRequestResult();
         }

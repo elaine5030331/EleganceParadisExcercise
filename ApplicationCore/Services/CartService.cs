@@ -42,10 +42,11 @@ namespace ApplicationCore.Services
                 var updateDTO = new UpdateCartItemDTO
                 {
                     AccountId = addCartItemDTO.AccountId,
+                    CartId = updateCartItem.Id,
                     SpecId = addCartItemDTO.SpecId,
                     Quantity = updateCartItem.Quantity
                 };
-                return await UpdateCartItemsAsync(addCartItemDTO.AccountId, updateDTO);
+                return await UpdateCartItemsAsync(updateDTO);
             }
 
             try
@@ -112,12 +113,13 @@ namespace ApplicationCore.Services
         /// <param name="updateCartItemDTO"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<OperationResult<CartDTO>> UpdateCartItemsAsync(int accountId, UpdateCartItemDTO updateCartItemDTO)
+        public async Task<OperationResult<CartDTO>> UpdateCartItemsAsync(UpdateCartItemDTO updateCartItemDTO)
         {
+            var accountId = updateCartItemDTO.AccountId;
             var cartList = await _cartRepository.ListAsync(c => c.AccountId == accountId);
             try
             {
-                var cartItem = cartList.SingleOrDefault(c => c.SpecId == updateCartItemDTO.SpecId);
+                var cartItem = cartList.SingleOrDefault(c => c.Id == updateCartItemDTO.CartId);
                 if (cartItem == null)
                 {
                     var updateResult = new OperationResult<CartDTO>()
@@ -130,6 +132,7 @@ namespace ApplicationCore.Services
                 }
                 else
                 {
+                    cartItem.SpecId = updateCartItemDTO.SpecId;
                     cartItem.Quantity = updateCartItemDTO.Quantity;
                     await _cartRepository.UpdateAsync(cartItem);
                     var tempCartList = await _cartRepository.ListAsync(c => c.AccountId == accountId);
@@ -234,6 +237,7 @@ namespace ApplicationCore.Services
                 var productImage = productImages.Where(pi => pi.ProductId == product.Id).OrderBy(x => x.Order).FirstOrDefault();
                 return new CartItem
                 {
+                    CartId = cart.Id,
                     SpecId = cart.SpecId,
                     CategoryName = category?.Name ?? string.Empty,
                     ProductName = product?.ProductName ?? string.Empty,
