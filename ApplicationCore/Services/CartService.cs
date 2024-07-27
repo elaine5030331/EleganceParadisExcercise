@@ -25,6 +25,11 @@ namespace ApplicationCore.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// 新增購物車內容
+        /// </summary>
+        /// <param name="addCartItemDTO"></param>
+        /// <returns></returns>
         public async Task<OperationResult<CartDTO>> AddCartItemAsync(AddCartItemDTO addCartItemDTO)
         {
             var cartList = await _cartRepository.ListAsync(c => c.AccountId == addCartItemDTO.AccountId);
@@ -65,6 +70,11 @@ namespace ApplicationCore.Services
             }
         }
 
+        /// <summary>
+        /// 取得購物車內容
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         public async Task<OperationResult<CartDTO>> GetCartItemsAsync(int accountId)
         {
             try
@@ -86,6 +96,12 @@ namespace ApplicationCore.Services
             }
         }
 
+        /// <summary>
+        /// 取得CartDTO資料，將需要回傳的資料組起來
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="cartItems"></param>
+        /// <returns></returns>
         private CartDTO GetCartDTO(int accountId, List<CartItem> cartItems)
         {
             var shippingFee = cartItems.Any() ? 130 : 0;
@@ -102,7 +118,11 @@ namespace ApplicationCore.Services
             };
         }
 
-
+        /// <summary>
+        /// 取得目前資料庫中的購物車資料
+        /// </summary>
+        /// <param name="carts"></param>
+        /// <returns></returns>
         private async Task<List<CartItem>> GetCurrentCartItems(List<Cart> carts)
         {
             var specs = await _specRepository.ListAsync(s => carts.Select(c => c.SpecId).Contains(s.Id));
@@ -130,6 +150,10 @@ namespace ApplicationCore.Services
             return result;
         }
 
+        /// <summary>
+        /// 取得付款方式
+        /// </summary>
+        /// <returns></returns>
         private List<PaymentType> GetPaymentTypes()
         {
             return new List<PaymentType>

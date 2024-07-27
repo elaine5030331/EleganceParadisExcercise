@@ -20,6 +20,24 @@ namespace EleganceParadisAPI.Controllers
             _cartService = cartService;
         }
 
+        /// <summary>
+        /// 新增商品至購物車
+        /// </summary>
+        /// <param name="addCartItemDTO"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///        "AccountId": 1, 
+        ///        "SpecId": 1(商品規格ID),
+        ///        "Quantity": 3(購物數量)"
+        ///     }
+        /// </remarks>
+        /// <response code ="400">
+        ///     1.找不到這個用戶 <br/>
+        ///     2.找不到AccountId對應的用戶<br/>
+        ///     3.加入購物車失敗(僅會回傳購物車原本的資料)
+        /// </response>
         [HttpPost("AddCartItem")]
         public async Task<IActionResult> AddCartItem(AddCartItemDTO addCartItemDTO)
         {
@@ -33,6 +51,16 @@ namespace EleganceParadisAPI.Controllers
             return result.GetBadRequestResult();
         }
 
+        /// <summary>
+        /// 取得購物車內容
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        /// <response code ="400">
+        ///     1.找不到這個用戶 <br/>
+        ///     2.找不到AccountId對應的用戶<br/>
+        ///     3.加入購物車失敗(僅會回傳購物車原本的資料)
+        /// </response>
         [HttpGet("GetCartItems/{accountId}")]
         public async Task<IActionResult> GetCartItems(int accountId)
         {
