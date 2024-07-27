@@ -7,5 +7,6 @@ namespace ApplicationCore.Interfaces
     {
         Task<OperationResult<CartDTO>> AddCartItemAsync(AddCartItemDTO addCartItemDTO);
         Task<OperationResult<CartDTO>> GetCartItemsAsync(int accountId);
+        Task<OperationResult<CartDTO>> UpdateCartItemsAsync(int accountId, UpdateCartItemDTO updateCartItemDTO);
     }
 }

@@ -37,6 +37,15 @@ namespace ApplicationCore.Services
             if (cartList != null && cartList.Select(x => x.SpecId).Contains(addCartItemDTO.SpecId))
             {
                 //UPDATE FLOW
+                var updateCartItem = cartList.FirstOrDefault(c => c.SpecId == addCartItemDTO.SpecId);
+                updateCartItem.Quantity += addCartItemDTO.Quantity;
+                var updateDTO = new UpdateCartItemDTO
+                {
+                    AccountId = addCartItemDTO.AccountId,
+                    SpecId = addCartItemDTO.SpecId,
+                    Quantity = updateCartItem.Quantity
+                };
+                return await UpdateCartItemsAsync(addCartItemDTO.AccountId, updateDTO);
             }
 
             try
@@ -50,7 +59,7 @@ namespace ApplicationCore.Services
                 var result = await _cartRepository.AddAsync(cartEntity);
                 cartList.Add(cartEntity);
 
-                var currentCart = await GetCurrentCartItems(cartList);
+                var currentCart = await GetCurrentCartItemsAsync(cartList);
 
                 return new OperationResult<CartDTO>()
                 {
@@ -65,7 +74,7 @@ namespace ApplicationCore.Services
                 {
                     IsSuccess = false,
                     ErrorMessage = "購物車新增失敗",
-                    ResultDTO = GetCartDTO(addCartItemDTO.AccountId, await GetCurrentCartItems(cartList))
+                    ResultDTO = GetCartDTO(addCartItemDTO.AccountId, await GetCurrentCartItemsAsync(cartList))
                 };
             }
         }
@@ -80,7 +89,7 @@ namespace ApplicationCore.Services
             try
             {
                 var carts = await _cartRepository.ListAsync(x => x.AccountId == accountId);
-                var cartItems = carts == null || carts.Count == 0 ? new List<CartItem>() : await GetCurrentCartItems(carts);
+                var cartItems = carts == null || carts.Count == 0 ? new List<CartItem>() : await GetCurrentCartItemsAsync(carts);
                 var cartDTO = GetCartDTO(accountId, cartItems);
                 return new OperationResult<CartDTO>(cartDTO);
             }
@@ -92,6 +101,54 @@ namespace ApplicationCore.Services
                     IsSuccess = false,
                     ErrorMessage = "取得購物車資料失敗",
                     ResultDTO = GetCartDTO(accountId, new List<CartItem>())
+                };
+            }
+        }
+
+        /// <summary>
+        /// 更新購物車內容
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="updateCartItemDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<OperationResult<CartDTO>> UpdateCartItemsAsync(int accountId, UpdateCartItemDTO updateCartItemDTO)
+        {
+            var cartList = await _cartRepository.ListAsync(c => c.AccountId == accountId);
+            try
+            {
+                var cartItem = cartList.SingleOrDefault(c => c.SpecId == updateCartItemDTO.SpecId);
+                if (cartItem == null)
+                {
+                    var updateResult = new OperationResult<CartDTO>()
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "找不到符合的規格ID",
+                        ResultDTO = GetCartDTO(accountId, await GetCurrentCartItemsAsync(cartList))
+                    };
+                    return updateResult;
+                }
+                else
+                {
+                    cartItem.Quantity = updateCartItemDTO.Quantity;
+                    await _cartRepository.UpdateAsync(cartItem);
+                    var tempCartList = await _cartRepository.ListAsync(c => c.AccountId == accountId);
+                    var result = new OperationResult<CartDTO>()
+                    {
+                        IsSuccess = true,
+                        ResultDTO = GetCartDTO(accountId, await GetCurrentCartItemsAsync(tempCartList))
+                    };
+                    return result;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogError(ex, ex.Message);
+                return new OperationResult<CartDTO>
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "購物車更新失敗",
+                    ResultDTO = GetCartDTO(accountId, await GetCurrentCartItemsAsync(cartList))
                 };
             }
         }
@@ -123,7 +180,7 @@ namespace ApplicationCore.Services
         /// </summary>
         /// <param name="carts"></param>
         /// <returns></returns>
-        private async Task<List<CartItem>> GetCurrentCartItems(List<Cart> carts)
+        private async Task<List<CartItem>> GetCurrentCartItemsAsync(List<Cart> carts)
         {
             var specs = await _specRepository.ListAsync(s => carts.Select(c => c.SpecId).Contains(s.Id));
             var products = await _productRepository.ListAsync(p => specs.Select(s => s.ProductId).Contains(p.Id));

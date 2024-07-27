@@ -78,5 +78,32 @@ namespace EleganceParadisAPI.Controllers
             //};
             //return BadRequest(errorResult);
         }
+
+        /// <summary>
+        /// 更新購物車內容
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="updateCartItemDTO"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///        "AccountId": 1, 
+        ///        "SpecId": 1(商品規格ID),
+        ///        "Quantity": 3(購物數量)"
+        ///     }
+        /// </remarks>
+        /// <response code ="400">
+        ///     1.找不到AccountId對應的用戶 <br/>
+        ///     2.更新購物車失敗(僅會回傳購物車原本的資料)
+        /// </response>
+        [HttpPatch("UpdateCartItems/{accountId}")]
+        public async Task<IActionResult> UpdateCartItems(int accountId, UpdateCartItemDTO updateCartItemDTO)
+        {
+            if(accountId != updateCartItemDTO.AccountId) return BadRequest();
+            var result = await _cartService.UpdateCartItemsAsync(accountId, updateCartItemDTO);
+            if (result.IsSuccess) return Ok(result.ResultDTO);
+            return result.GetBadRequestResult();
+        }
     }
 }
