@@ -82,7 +82,6 @@ namespace EleganceParadisAPI.Controllers
         /// <summary>
         /// 更新購物車內容
         /// </summary>
-        /// <param name="accountId"></param>
         /// <param name="updateCartItemDTO"></param>
         /// <returns></returns>
         /// <remarks>
@@ -97,11 +96,14 @@ namespace EleganceParadisAPI.Controllers
         ///     1.找不到AccountId對應的用戶 <br/>
         ///     2.更新購物車失敗(僅會回傳購物車原本的資料)
         /// </response>
-        [HttpPatch("UpdateCartItems/{accountId}")]
-        public async Task<IActionResult> UpdateCartItems(int accountId, UpdateCartItemDTO updateCartItemDTO)
+        [HttpPatch("UpdateCartItems")]
+        public async Task<IActionResult> UpdateCartItems(UpdateCartItemDTO updateCartItemDTO)
         {
-            if(accountId != updateCartItemDTO.AccountId) return BadRequest();
-            var result = await _cartService.UpdateCartItemsAsync(accountId, updateCartItemDTO);
+            var accountId = User.GetAccountId();
+            if (accountId == null) return BadRequest("查無此人");
+            if(accountId != updateCartItemDTO.AccountId) return BadRequest("AccountId 不符");
+
+            var result = await _cartService.UpdateCartItemsAsync(updateCartItemDTO.AccountId, updateCartItemDTO);
             if (result.IsSuccess) return Ok(result.ResultDTO);
             return result.GetBadRequestResult();
         }
