@@ -1,9 +1,11 @@
 ﻿using ApplicationCore.DTOs;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using System.Text;
 
@@ -11,28 +13,21 @@ namespace Infrastructure.Services
 {
     public class MailKitService : IEmailSender
     {
-        private class MailServerSettings
-        {
-            public string Host { get; set; }
-            public int Port { get; set; }
-            public bool IsSSL { get; set; }
-            public string UserName { get; set; }
-            public string Password { get; set; }
-        }
         private readonly ILogger<MailKitService> _logger;
-        private readonly MailServerSettings _settings;
+        private readonly MailServerOptions _settings;
 
-        public MailKitService(ILogger<MailKitService> logger, IConfiguration configuration)
+        public MailKitService(ILogger<MailKitService> logger, IConfiguration configuration, IOptions<MailServerOptions> options)
         {
             _logger = logger;
-            _settings = new MailServerSettings()
-            {
-                Host = configuration["MailSererSettings:Host"]!,
-                Port = int.Parse(configuration["MailSererSettings:Port"]!),
-                IsSSL = bool.Parse(configuration["MailSererSettings:IsSSL"]!),
-                UserName = configuration["MailSererSettings:UserName"]!,
-                Password = configuration["MailSererSettings:Password"]!
-            };
+            _settings = options.Value;
+            //_settings = new MailServerSettings()
+            //{
+            //    Host = configuration["MailSererSettings:Host"]!,
+            //    Port = int.Parse(configuration["MailSererSettings:Port"]!),
+            //    IsSSL = bool.Parse(configuration["MailSererSettings:IsSSL"]!),
+            //    UserName = configuration["MailSererSettings:UserName"]!,
+            //    Password = configuration["MailSererSettings:Password"]!
+            //};
         }
 
         public async Task SendAsync(EmailDTO emailDTO)

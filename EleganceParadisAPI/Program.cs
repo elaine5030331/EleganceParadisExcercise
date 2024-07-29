@@ -1,4 +1,5 @@
 
+using ApplicationCore.Models;
 using EleganceParadisAPI.Configurations;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,8 @@ namespace EleganceParadisAPI
                     } 
                 });
             });
+
+            builder.Services.Configure<MailServerOptions>(builder.Configuration.GetSection(MailServerOptions.MailServerSettings));
 
             builder.Services.AddApplicationCoreServices()
                             .AddWebAPIServices()
