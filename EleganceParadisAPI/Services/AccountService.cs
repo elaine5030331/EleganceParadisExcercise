@@ -1,8 +1,12 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.DTOs;
+using ApplicationCore.Entities;
+using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using EleganceParadisAPI.DTOs;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 using static ApplicationCore.Entities.Account;
 
 namespace EleganceParadisAPI.Services
@@ -14,12 +18,23 @@ namespace EleganceParadisAPI.Services
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
         private const string mobilePattern = @"^09\d{8}$";
         private const string emailPattern = @".*@.*\..*";
+        private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountService> _logger;
 
-        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher)
+        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher, IEmailSender emailSender, ILogger<AccountService> logger)
         {
             _accountRepo = accountRepo;
             _applicationPasswordHasher = applicationPasswordHasher;
+            _emailSender = emailSender;
+            _logger = logger;
         }
+
+        private class VerifyEmailDTO
+        {
+            public int AccountId { get; set; }
+            public DateTimeOffset ExpireTime { get; set; }
+        }
+
 
         public async Task<OperationResult<CreateAccountResultDTO>> CreateAccount(RegistDTO registInfo)
         {
@@ -65,8 +80,64 @@ namespace EleganceParadisAPI.Services
                 Name = registInfo.Name,
                 AccountId = account.Id
             };
-            return new OperationResult<CreateAccountResultDTO>(result);
 
+            await SendVerifyEmailHandler(registInfo, account);
+
+            return new OperationResult<CreateAccountResultDTO>(result);
+        }
+
+        /// <summary>
+        /// 寄發驗證信
+        /// </summary>
+        /// <param name="registInfo"></param>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        private async Task SendVerifyEmailHandler(RegistDTO registInfo, Account account)
+        {
+            var verifyDTO = new VerifyEmailDTO()
+            {
+                AccountId = account.Id,
+                ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
+            };
+
+            var byteArr = JsonSerializer.SerializeToUtf8Bytes(verifyDTO);
+            var base64Str = Convert.ToBase64String(byteArr);
+            var urlEncode = HttpUtility.UrlEncode(base64Str);
+            //TODO:是否需要作為參數
+            var returnURL = $"https://localhost:7100/api/account/VerifyEmail/{urlEncode}";
+            var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
+            await _emailSender.SendAsync(new EmailDTO
+            {
+                MailTo = registInfo.Name,
+                MailToEmail = registInfo.Email,
+                Subject = "EleganceParadis 註冊驗證信",
+                HTMLContent = mailTemplate
+            });
+        }
+
+        public async Task<OperationResult> VerifyEmailAsync(string encodingParameter)
+        {
+            try
+            {
+                var byteArr = Convert.FromBase64String(encodingParameter);
+                var verifyDTO = JsonSerializer.Deserialize<VerifyEmailDTO>(byteArr);
+
+                if (verifyDTO == null) 
+                    return new OperationResult("註冊驗證參數異常");
+
+                if (verifyDTO.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0)
+                    return new OperationResult("註冊驗證逾時");
+
+                var account = await _accountRepo.GetByIdAsync(verifyDTO.AccountId);
+                account.Status = AccountStatus.Verified;
+                await _accountRepo.UpdateAsync(account);
+                return new OperationResult();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("註冊驗證失敗");
+            }
         }
 
         public async Task<GetAccountInfoDTO> GetAccountInfo(int accountId)

@@ -1,4 +1,5 @@
-﻿using EleganceParadisAPI.DTOs;
+﻿using ApplicationCore.Interfaces;
+using EleganceParadisAPI.DTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +14,12 @@ namespace EleganceParadisAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly AccountService _accountService;
+        private readonly IEmailSender _emailSender;
 
-        public AccountController(AccountService accountService)
+        public AccountController(AccountService accountService, IEmailSender emailSender)
         {
             _accountService = accountService;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -98,6 +101,16 @@ namespace EleganceParadisAPI.Controllers
             var result = await _accountService.UpdateAccountPassword(accountInfo);
             if (result.IsSuccess) return NoContent();
             else return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("VerifyEmail/{encodingParameter}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail(string encodingParameter)
+        {
+            var result = await _accountService.VerifyEmailAsync(encodingParameter);
+            //TODO:驗證後流程確認
+            if (result.IsSuccess) return Redirect("https://eleganceparadis.azurewebsites.net");
+            return BadRequest(result.ErrorMessage);
         }
     }
 }
