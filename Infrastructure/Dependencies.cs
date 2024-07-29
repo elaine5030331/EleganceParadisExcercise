@@ -1,19 +1,12 @@
-﻿using ApplicationCore.Entities;
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using Infrastructure.Data;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Infrastructure
 {
