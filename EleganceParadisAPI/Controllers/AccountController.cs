@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.Interfaces;
 using EleganceParadisAPI.DTOs;
+using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -112,5 +113,35 @@ namespace EleganceParadisAPI.Controllers
             if (result.IsSuccess) return Redirect("https://eleganceparadis.azurewebsites.net");
             return BadRequest(result.ErrorMessage);
         }
+
+        [HttpPost("ForgetPassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        {
+            var result = await _accountService.ForgetPasswordAsync(forgetPasswordDTO.Email);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("ForgetPassword/{encodingParameter}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgetPassword(string encodingParameter)
+        {
+            var result = await _accountService.VerifyForgetPasswordAsync(encodingParameter);
+            //TODO:驗證後流程確認
+            if (result.IsSuccess) return Redirect("https://eleganceparadis.azurewebsites.net");
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPatch("ResetAccountPassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordDTO resetAccountPasswordDTO)
+        {
+            var result = await _accountService.ResetAccountPasswordAsync(resetAccountPasswordDTO.AccountId, resetAccountPasswordDTO.NewPassword);
+            //TODO:重設成功回傳內容確認
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
     }
 }

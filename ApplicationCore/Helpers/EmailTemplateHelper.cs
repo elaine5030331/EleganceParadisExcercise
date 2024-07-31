@@ -21,8 +21,8 @@ namespace ApplicationCore.Helpers
         {
             return string.Format(@"
             <h1>EleganceParadis 重設密碼驗證信</h1>
-            <p>親愛的{0}您好，</p>
-            <p>本信件為 EleganceParadis 【重設密碼驗證信】，為確保您的資訊安全，請務必於五分鐘內點擊以下連結，重設您的密碼，以維護您的權益。</p>
+            <p>親愛的 {0} 您好，</p>
+            <p>本信件為 EleganceParadis 【重設密碼驗證信】，為確保您的資訊安全，請務必於 15 分鐘內點擊以下連結，重設您的密碼，以維護您的權益。</p>
             <p><a href=""{1}"">點此連結進行密碼更改</a></p>", mailTo, returnURL);
         }
     }

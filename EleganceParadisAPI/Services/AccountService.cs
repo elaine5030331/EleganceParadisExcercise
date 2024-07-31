@@ -35,6 +35,12 @@ namespace EleganceParadisAPI.Services
             public DateTimeOffset ExpireTime { get; set; }
         }
 
+        private class ForgetPasswordDTO
+        {
+            public int AccountId { get; set; }
+            public DateTimeOffset ExpireTime { get; set; }
+        }
+
 
         public async Task<OperationResult<CreateAccountResultDTO>> CreateAccount(RegistDTO registInfo)
         {
@@ -99,10 +105,8 @@ namespace EleganceParadisAPI.Services
                 AccountId = account.Id,
                 ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
             };
+            string urlEncode = SerializeInput(verifyDTO);
 
-            var byteArr = JsonSerializer.SerializeToUtf8Bytes(verifyDTO);
-            var base64Str = Convert.ToBase64String(byteArr);
-            var urlEncode = HttpUtility.UrlEncode(base64Str);
             //TODO:是否需要作為參數
             var returnURL = $"https://localhost:7100/api/account/VerifyEmail/{urlEncode}";
             var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
@@ -115,14 +119,21 @@ namespace EleganceParadisAPI.Services
             });
         }
 
+        private static string SerializeInput<T>(T input) where T : class
+        {
+            var byteArr = JsonSerializer.SerializeToUtf8Bytes(input);
+            var base64Str = Convert.ToBase64String(byteArr);
+            var urlEncode = HttpUtility.UrlEncode(base64Str);
+            return urlEncode;
+        }
+
         public async Task<OperationResult> VerifyEmailAsync(string encodingParameter)
         {
             try
             {
-                var byteArr = Convert.FromBase64String(encodingParameter);
-                var verifyDTO = JsonSerializer.Deserialize<VerifyEmailDTO>(byteArr);
+                VerifyEmailDTO verifyDTO = DeserializeParameter<VerifyEmailDTO>(encodingParameter);
 
-                if (verifyDTO == null) 
+                if (verifyDTO == null)
                     return new OperationResult("註冊驗證參數異常");
 
                 if (verifyDTO.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0)
@@ -133,10 +144,25 @@ namespace EleganceParadisAPI.Services
                 await _accountRepo.UpdateAsync(account);
                 return new OperationResult();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult("註冊驗證失敗");
+            }
+        }
+
+        private T DeserializeParameter<T>(string encodingParameter) where T : class
+        {
+            try
+            {
+                var byteArr = Convert.FromBase64String(encodingParameter);
+                var output = JsonSerializer.Deserialize<T>(byteArr);
+                return output;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return null;
             }
         }
 
@@ -226,7 +252,7 @@ namespace EleganceParadisAPI.Services
 
             var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
 
-            if (account == null) 
+            if (account == null)
                 return new OperationResult<UpdateAccountPasswordResult>("查無此人");
 
             if (!_applicationPasswordHasher.VerifyPassword(account.Password, accountInfo.OldPassword))
@@ -242,5 +268,76 @@ namespace EleganceParadisAPI.Services
             return new OperationResult<UpdateAccountPasswordResult>(updatedResult);
         }
 
+        public async Task<OperationResult> ForgetPasswordAsync(string email)
+        {
+            try
+            {
+                var account = await _accountRepo.FirstOrDefaultAsync(x => x.Email == email);
+                if (account == null) return new OperationResult("找不到對應的AccountId");
+
+                var forgetPasswordDTO = new ForgetPasswordDTO
+                {
+                    AccountId = account.Id,
+                    ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
+                };
+
+                var urlEncode = SerializeInput(forgetPasswordDTO);
+                //TODO:重設密碼流程確認
+                var returnURL = $"https://localhost:7100/api/account/ForgetPassword/{urlEncode}";
+                var mailTemplate = EmailTemplateHelper.ForgetPasswordEmailTemplate(account.Name, returnURL);
+                await _emailSender.SendAsync(new EmailDTO
+                {
+                    MailTo = account.Name,
+                    MailToEmail = email,
+                    Subject = "重設密碼驗證信",
+                    HTMLContent = mailTemplate
+                });
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("重設密碼驗證信寄發失敗");
+            }
+        }
+
+        public async Task<OperationResult> VerifyForgetPasswordAsync(string encodingParameter)
+        {
+            var dto = DeserializeParameter<ForgetPasswordDTO>(encodingParameter);
+
+            if (dto == null) return new OperationResult("重設密碼參數異常");
+            if (dto.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0) return new OperationResult("重設密碼逾時");
+
+            var account = await _accountRepo.GetByIdAsync(dto.AccountId);
+            if (account == null) return new OperationResult("無法找到對應的AccountId");
+
+            return new OperationResult();
+        }
+
+        public async Task<OperationResult> ResetAccountPasswordAsync(int accountId, string newPassword)
+        {
+            try
+            {
+                if (!Regex.IsMatch(newPassword, passwordPattern))
+                    return new OperationResult("密碼格式有誤");
+
+                var account = await _accountRepo.GetByIdAsync(accountId);
+                if (account == null) return new OperationResult("找不到對應的AccountId");
+
+                if (_applicationPasswordHasher.VerifyPassword(account.Password, newPassword))
+                    return new OperationResult("與舊密碼相同");
+
+                account.Password = _applicationPasswordHasher.HashPassword(newPassword);
+                await _accountRepo.UpdateAsync(account);
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("重設密碼失敗");
+            }
+        }
     }
 }
