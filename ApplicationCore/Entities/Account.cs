@@ -22,6 +22,8 @@ public partial class Account
     /// </summary>
     public AccountStatus Status { get; set; }
 
+    public virtual ICollection<AuthTokenHistory> AuthTokenHistories { get; set; } = new List<AuthTokenHistory>();
+
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

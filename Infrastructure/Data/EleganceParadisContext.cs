@@ -18,6 +18,8 @@ public partial class EleganceParadisContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
+    public virtual DbSet<AuthTokenHistory> AuthTokenHistories { get; set; }
+
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
@@ -40,6 +42,18 @@ public partial class EleganceParadisContext : DbContext
         {
             entity.Property(e => e.Mobile).HasMaxLength(256);
             entity.Property(e => e.Status).HasComment("EX：黑名單、是否被驗證");
+        });
+
+        modelBuilder.Entity<AuthTokenHistory>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.AccessToken).HasComment("JWT");
+            entity.Property(e => e.ExpiredTime).HasComment("RefreshToken過期時間");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.AuthTokenHistories)
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AuthTokenHistories_Accounts");
         });
 
         modelBuilder.Entity<Cart>(entity =>
