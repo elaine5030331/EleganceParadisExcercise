@@ -61,6 +61,68 @@ namespace EleganceParadisAPI.Controllers
         ///     2.找不到AccountId對應的用戶<br/>
         ///     3.加入購物車失敗(僅會回傳購物車原本的資料)
         /// </response>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///      {
+        ///       "accountId": 2,
+        ///       "cartItems": [
+        ///         {
+        ///           "cartId": 2,
+        ///           "selectedSpecId": 2,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "100ml",
+        ///           "unitPrice": 7777,
+        ///           "quantity": 100,
+        ///           "stock": null, //(null: 無限庫存)
+        ///           "specs": [
+        ///             {
+        ///               "specId": 2,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 7777,
+        ///               "stock": null //(null: 無限庫存)
+        ///             }
+        ///           ]
+        ///         },
+        ///         {
+        ///         "cartId": 5,
+        ///           "selectedSpecId": 1,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "50ml",
+        ///           "unitPrice": 999,
+        ///           "quantity": 200,
+        ///           "stock": 4,
+        ///           "specs": [
+        ///             {
+        ///             "specId": 1,
+        ///               "specName": "50ml",
+        ///               "unitPrice": 999,
+        ///               "stock": 4
+        ///             },
+        ///             {
+        ///             "specId": 3,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 3999,
+        ///               "stock": 5
+        ///             }
+        ///           ]
+        ///         }
+        ///       ],
+        ///       "shippingFee": 130,
+        ///       "subTotal": 977500,
+        ///       "cartTotal": 977630,
+        ///       "paymentTypes": [
+        ///         {
+        ///           "type": 0,
+        ///           "displayName": "LinePay",
+        ///           "icon": ""
+        ///         }
+        ///       ]
+        ///     }
+        /// </remarks>
         [HttpGet("GetCartItems/{accountId}")]
         public async Task<IActionResult> GetCartItems(int accountId)
         {
