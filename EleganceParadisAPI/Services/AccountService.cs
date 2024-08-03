@@ -7,6 +7,7 @@ using EleganceParadisAPI.DTOs;
 using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -110,10 +111,11 @@ namespace EleganceParadisAPI.Services
                 AccountId = account.Id,
                 ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
             };
-            string urlEncode = SerializeInput(verifyDTO);
+            string serializeStr = SerializeInput(verifyDTO);
 
             var uri = new Uri(_sendEmailSettins.VerifyEmailReturnURL).GetLeftPart(UriPartial.Path);
-            var returnURL = QueryHelpers.AddQueryString(uri, "p", urlEncode);
+            //QueryHelpers.AddQueryString 回傳 URLEncode後的結果
+            var returnURL = QueryHelpers.AddQueryString(uri, "p", serializeStr);
 
             var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
             await _emailSender.SendAsync(new EmailDTO
@@ -125,19 +127,25 @@ namespace EleganceParadisAPI.Services
             });
         }
 
+        /// <summary>
+        /// 將物件序列化為base64 string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private static string SerializeInput<T>(T input) where T : class
         {
             var byteArr = JsonSerializer.SerializeToUtf8Bytes(input);
             var base64Str = Convert.ToBase64String(byteArr);
-            var urlEncode = HttpUtility.UrlEncode(base64Str);
-            return urlEncode;
+            return base64Str;
         }
 
         public async Task<OperationResult<VerifyEmailResponse>> VerifyEmailAsync(string encodingParameter)
         {
             try
             {
-                VerifyEmailDTO verifyDTO = DeserializeParameter<VerifyEmailDTO>(encodingParameter);
+                var decodeURL = HttpUtility.UrlDecode(encodingParameter);
+                VerifyEmailDTO verifyDTO = DeserializeParameter<VerifyEmailDTO>(decodeURL);
 
                 if (verifyDTO == null)
                     return new OperationResult<VerifyEmailResponse>("註冊驗證參數異常");
@@ -167,15 +175,21 @@ namespace EleganceParadisAPI.Services
             }
         }
 
-        private T DeserializeParameter<T>(string encodingParameter) where T : class
+        /// <summary>
+        /// 反序列化base64 string to Object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="base64Str"></param>
+        /// <returns></returns>
+        private T DeserializeParameter<T>(string base64Str) where T : class
         {
             try
             {
-                var byteArr = Convert.FromBase64String(encodingParameter);
+                var byteArr = Convert.FromBase64String(base64Str);
                 var output = JsonSerializer.Deserialize<T>(byteArr);
                 return output;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return null;
@@ -298,8 +312,10 @@ namespace EleganceParadisAPI.Services
                 };
 
                 var urlEncode = SerializeInput(forgetPasswordDTO);
-                //TODO:重設密碼流程確認
-                var returnURL = $"https://localhost:7100/api/account/ForgetPassword/{urlEncode}";
+
+                var uri = new Uri(_sendEmailSettins.ForgetPasswordReturnURL).GetLeftPart(UriPartial.Path);
+                var returnURL = QueryHelpers.AddQueryString(uri, "p", urlEncode);
+
                 var mailTemplate = EmailTemplateHelper.ForgetPasswordEmailTemplate(account.Name, returnURL);
                 await _emailSender.SendAsync(new EmailDTO
                 {
@@ -320,7 +336,8 @@ namespace EleganceParadisAPI.Services
 
         public async Task<OperationResult> VerifyForgetPasswordAsync(string encodingParameter)
         {
-            var dto = DeserializeParameter<ForgetPasswordDTO>(encodingParameter);
+            var decodeURL = HttpUtility.UrlDecode(encodingParameter);
+            var dto = DeserializeParameter<ForgetPasswordDTO>(decodeURL);
 
             if (dto == null) return new OperationResult("重設密碼參數異常");
             if (dto.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0) return new OperationResult("重設密碼逾時");
@@ -331,20 +348,26 @@ namespace EleganceParadisAPI.Services
             return new OperationResult();
         }
 
-        public async Task<OperationResult> ResetAccountPasswordAsync(int accountId, string newPassword)
+        public async Task<OperationResult> ResetAccountPasswordAsync(ResetAccountPasswordDTO request)
         {
             try
-            {
-                if (!Regex.IsMatch(newPassword, passwordPattern))
+            {   
+                var verifyResult = await VerifyForgetPasswordAsync(request.EncodingParameter);
+                if (!verifyResult.IsSuccess)
+                    return verifyResult;
+
+                if (!Regex.IsMatch(request.NewPassword, passwordPattern))
                     return new OperationResult("密碼格式有誤");
 
+                var decodeURL = HttpUtility.UrlDecode(request.EncodingParameter);
+                var accountId = DeserializeParameter<ForgetPasswordDTO>(decodeURL).AccountId;
                 var account = await _accountRepo.GetByIdAsync(accountId);
                 if (account == null) return new OperationResult("找不到對應的AccountId");
 
-                if (_applicationPasswordHasher.VerifyPassword(account.Password, newPassword))
+                if (_applicationPasswordHasher.VerifyPassword(account.Password, request.NewPassword))
                     return new OperationResult("與舊密碼相同");
 
-                account.Password = _applicationPasswordHasher.HashPassword(newPassword);
+                account.Password = _applicationPasswordHasher.HashPassword(request.NewPassword);
                 await _accountRepo.UpdateAsync(account);
 
                 return new OperationResult();

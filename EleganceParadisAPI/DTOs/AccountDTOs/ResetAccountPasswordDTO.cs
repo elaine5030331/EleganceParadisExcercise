@@ -2,7 +2,7 @@
 {
     public class ResetAccountPasswordDTO
     {
-        public int AccountId { get; set; }
+        public string EncodingParameter { get; set; }
         public string NewPassword { get; set; }
     }
 }
