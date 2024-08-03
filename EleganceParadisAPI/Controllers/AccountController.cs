@@ -106,6 +106,19 @@ namespace EleganceParadisAPI.Controllers
             else return BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// 發送註冊驗證信
+        /// </summary>
+        /// <param name="encodingParameter"></param>
+        /// <returns></returns>
+        /// <response code ="400">
+        /// 1. 註冊驗證參數異常
+        /// 2. 註冊驗證逾時
+        /// 3. 註冊驗證失敗
+        /// </response>
+        /// <remarks>
+        /// encodingParameter: API導回前台的Query string
+        /// </remarks>
         [HttpGet("VerifyEmail/{encodingParameter}")]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyEmail(string encodingParameter)
@@ -121,6 +134,15 @@ namespace EleganceParadisAPI.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// 發送重設密碼信件
+        /// </summary>
+        /// <param name="forgetPasswordDTO"></param>
+        /// <returns></returns>
+        /// <response code ="400">
+        /// 1. 找不到對應的AccountId
+        /// 2. 重設密碼驗證信寄發失敗
+        /// </response>
         [HttpPost("ForgetPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
@@ -130,6 +152,17 @@ namespace EleganceParadisAPI.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// 重設密碼
+        /// </summary>
+        /// <param name="resetAccountPasswordDTO"></param>
+        /// <returns></returns>
+        /// <response code ="400">
+        /// 1. 密碼格式有誤
+        /// 2. 找不到對應的AccountId
+        /// 3. 與舊密碼相同
+        /// 4. 重設密碼失敗
+        /// </response>
         [HttpPost("ResetAccountPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordDTO resetAccountPasswordDTO)
