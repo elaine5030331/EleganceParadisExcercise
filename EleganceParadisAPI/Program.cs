@@ -3,6 +3,7 @@ using ApplicationCore.Models;
 using EleganceParadisAPI.Configurations;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -69,6 +70,10 @@ namespace EleganceParadisAPI
             });
 
             builder.Services.Configure<MailServerOptions>(builder.Configuration.GetSection(MailServerOptions.MailServerSettings));
+
+            builder.Services
+                .Configure<SendEmailSettings>(builder.Configuration.GetSection(SendEmailSettings.SendEmailSettingsKey))
+                .AddSingleton(provider => provider.GetRequiredService<IOptions<SendEmailSettings>>().Value);
 
             builder.Services.AddApplicationCoreServices()
                             .AddWebAPIServices()

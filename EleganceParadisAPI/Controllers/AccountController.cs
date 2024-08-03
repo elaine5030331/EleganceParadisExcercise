@@ -16,11 +16,13 @@ namespace EleganceParadisAPI.Controllers
     {
         private readonly AccountService _accountService;
         private readonly IEmailSender _emailSender;
+        private readonly JWTHelper _jwtHelper;
 
-        public AccountController(AccountService accountService, IEmailSender emailSender)
+        public AccountController(AccountService accountService, IEmailSender emailSender, JWTHelper jwtHelper)
         {
             _accountService = accountService;
             _emailSender = emailSender;
+            _jwtHelper = jwtHelper;
         }
 
         /// <summary>
@@ -56,10 +58,10 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> GetAccount(int? id)
         {
             int accountId;
-           
+
 
             if (!id.HasValue)
-            {  
+            {
                 var getAccountIdRes = User.GetAccountId();
                 if (getAccountIdRes == null) return BadRequest("查無此人");
                 accountId = getAccountIdRes.Value;
@@ -109,8 +111,13 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> VerifyEmail(string encodingParameter)
         {
             var result = await _accountService.VerifyEmailAsync(encodingParameter);
-            //TODO:驗證後流程確認
-            if (result.IsSuccess) return Redirect("https://eleganceparadis.azurewebsites.net");
+            if (result.IsSuccess)
+                return Ok(_jwtHelper.GenerateToken(new GenerateTokenDTO
+                {
+                    AccountId = result.ResultDTO.AccountId,
+                    Email = result.ResultDTO.Email,
+                    ExpireMinutes = result.ResultDTO.ExpireTime
+                }));
             return BadRequest(result.ErrorMessage);
         }
 

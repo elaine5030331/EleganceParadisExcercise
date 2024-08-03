@@ -4,6 +4,9 @@ using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using EleganceParadisAPI.DTOs;
+using EleganceParadisAPI.DTOs.AccountDTOs;
+using EleganceParadisAPI.Helpers;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -20,13 +23,15 @@ namespace EleganceParadisAPI.Services
         private const string emailPattern = @".*@.*\..*";
         private readonly IEmailSender _emailSender;
         private readonly ILogger<AccountService> _logger;
+        private readonly SendEmailSettings _sendEmailSettins;
 
-        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher, IEmailSender emailSender, ILogger<AccountService> logger)
+        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher, IEmailSender emailSender, ILogger<AccountService> logger, SendEmailSettings sendEmailSettings)
         {
             _accountRepo = accountRepo;
             _applicationPasswordHasher = applicationPasswordHasher;
             _emailSender = emailSender;
             _logger = logger;
+            _sendEmailSettins = sendEmailSettings;
         }
 
         private class VerifyEmailDTO
@@ -107,8 +112,9 @@ namespace EleganceParadisAPI.Services
             };
             string urlEncode = SerializeInput(verifyDTO);
 
-            //TODO:是否需要作為參數
-            var returnURL = $"https://localhost:7100/api/account/VerifyEmail/{urlEncode}";
+            var uri = new Uri(_sendEmailSettins.VerifyEmailReturnURL).GetLeftPart(UriPartial.Path);
+            var returnURL = QueryHelpers.AddQueryString(uri, "p", urlEncode);
+
             var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
             await _emailSender.SendAsync(new EmailDTO
             {
@@ -127,27 +133,37 @@ namespace EleganceParadisAPI.Services
             return urlEncode;
         }
 
-        public async Task<OperationResult> VerifyEmailAsync(string encodingParameter)
+        public async Task<OperationResult<VerifyEmailResponse>> VerifyEmailAsync(string encodingParameter)
         {
             try
             {
                 VerifyEmailDTO verifyDTO = DeserializeParameter<VerifyEmailDTO>(encodingParameter);
 
                 if (verifyDTO == null)
-                    return new OperationResult("註冊驗證參數異常");
+                    return new OperationResult<VerifyEmailResponse>("註冊驗證參數異常");
 
                 if (verifyDTO.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0)
-                    return new OperationResult("註冊驗證逾時");
+                    return new OperationResult<VerifyEmailResponse>("註冊驗證逾時");
 
                 var account = await _accountRepo.GetByIdAsync(verifyDTO.AccountId);
                 account.Status = AccountStatus.Verified;
                 await _accountRepo.UpdateAsync(account);
-                return new OperationResult();
+
+                return new OperationResult<VerifyEmailResponse>()
+                {
+                    IsSuccess = true,
+                    ResultDTO = new VerifyEmailResponse()
+                    {
+                        AccountId = account.Id,
+                        Email = account.Email,
+                        ExpireTime = 15
+                    }
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new OperationResult("註冊驗證失敗");
+                return new OperationResult<VerifyEmailResponse>("註冊驗證失敗");
             }
         }
 
