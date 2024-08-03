@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Models;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Models;
 
 namespace ApplicationCore.DTOs.CartDTO
 {
@@ -31,18 +32,28 @@ namespace ApplicationCore.DTOs.CartDTO
     public class CartItem
     {
         public int CartId { get; set; }
-        public int SpecId { get; set; }
+        public int SelectedSpecId { get; set; }
         public string CategoryName { get; set; }
         public string ProductName { get; set; }
         public string ProductImage { get; set; }
         public string SpecName { get; set; }
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
+        public int? Stock { get; set; }
+        public List<Specs> Specs { get; set; }
+    }
+
+    public class Specs
+    {
+        public int SpecId { get; set; }
+        public string SpecName { get; set; }
+        public decimal UnitPrice { get; set; }
+        public int? Stock { get; set; }
     }
 
     public enum PaymentTypes
     {
-        EasyPay = 0,
-        LinePay = 1
+        LinePay = 0,
+        ECPay = 1
     }
 }

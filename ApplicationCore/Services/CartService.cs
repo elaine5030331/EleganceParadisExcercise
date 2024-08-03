@@ -144,7 +144,7 @@ namespace ApplicationCore.Services
                     return result;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger?.LogError(ex, ex.Message);
                 return new OperationResult<CartDTO>
@@ -187,7 +187,7 @@ namespace ApplicationCore.Services
                 };
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 var result = new OperationResult<CartDTO>
@@ -231,6 +231,7 @@ namespace ApplicationCore.Services
         {
             var specs = await _specRepository.ListAsync(s => carts.Select(c => c.SpecId).Contains(s.Id));
             var products = await _productRepository.ListAsync(p => specs.Select(s => s.ProductId).Contains(p.Id));
+            var allSpecs = await _specRepository.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId));
             var categories = await _categoryRepository.ListAsync(c => products.Select(p => p.CategoryId).Contains(c.Id));
             var productImages = await _productImageRepository.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId));
 
@@ -240,16 +241,29 @@ namespace ApplicationCore.Services
                 var product = products.FirstOrDefault(p => p.Id == spec.ProductId);
                 var category = categories.FirstOrDefault(c => c.Id == product.CategoryId);
                 var productImage = productImages.Where(pi => pi.ProductId == product.Id).OrderBy(x => x.Order).FirstOrDefault();
+                var specList = allSpecs
+                    .Where(x => x.ProductId == product.Id)
+                    .Select(x => new Specs
+                    {
+                        SpecId = x.Id,
+                        SpecName = x.SpecName,
+                        UnitPrice = x.UnitPrice,
+                        Stock = x.StockQuantity
+                    })
+                    .ToList();
+
                 return new CartItem
                 {
                     CartId = cart.Id,
-                    SpecId = cart.SpecId,
+                    SelectedSpecId = cart.SpecId,
                     CategoryName = category?.Name ?? string.Empty,
                     ProductName = product?.ProductName ?? string.Empty,
                     ProductImage = productImage?.Url ?? string.Empty,//商品圖預設路徑
                     SpecName = spec?.SpecName ?? string.Empty,
                     UnitPrice = spec?.UnitPrice ?? 0,
-                    Quantity = cart.Quantity
+                    Quantity = cart.Quantity,
+                    Stock = spec.StockQuantity,
+                    Specs = specList
                 };
             }).ToList();
             return result;
@@ -265,8 +279,8 @@ namespace ApplicationCore.Services
             {
                 new PaymentType()
                 {
-                    Type = PaymentTypes.EasyPay,
-                    DisplayName = "綠界金流",
+                    Type = PaymentTypes.LinePay,
+                    DisplayName = "LinePay",
                     Icon = string.Empty
                 }
             };
