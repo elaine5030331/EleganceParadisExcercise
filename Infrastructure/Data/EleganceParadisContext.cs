@@ -46,7 +46,6 @@ public partial class EleganceParadisContext : DbContext
 
         modelBuilder.Entity<AuthTokenHistory>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.AccessToken).HasComment("JWT");
             entity.Property(e => e.ExpiredTime).HasComment("RefreshToken過期時間");
 
