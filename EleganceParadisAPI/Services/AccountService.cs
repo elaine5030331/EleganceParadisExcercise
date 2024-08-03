@@ -144,8 +144,7 @@ namespace EleganceParadisAPI.Services
         {
             try
             {
-                var decodeURL = HttpUtility.UrlDecode(encodingParameter);
-                VerifyEmailDTO verifyDTO = DeserializeParameter<VerifyEmailDTO>(decodeURL);
+                var verifyDTO = DeserializeURLEncodeParameter<VerifyEmailDTO>(encodingParameter);
 
                 if (verifyDTO == null)
                     return new OperationResult<VerifyEmailResponse>("註冊驗證參數異常");
@@ -195,6 +194,13 @@ namespace EleganceParadisAPI.Services
                 return null;
             }
         }
+
+        private T DeserializeURLEncodeParameter<T>(string encodeParameter) where T : class
+        {
+            var decode = HttpUtility.UrlDecode(encodeParameter);
+            return DeserializeParameter<T>(decode);
+        }
+
 
         public async Task<GetAccountInfoDTO> GetAccountInfo(int accountId)
         {
@@ -336,8 +342,7 @@ namespace EleganceParadisAPI.Services
 
         public async Task<OperationResult> VerifyForgetPasswordAsync(string encodingParameter)
         {
-            var decodeURL = HttpUtility.UrlDecode(encodingParameter);
-            var dto = DeserializeParameter<ForgetPasswordDTO>(decodeURL);
+            var dto = DeserializeURLEncodeParameter<ForgetPasswordDTO>(encodingParameter);
 
             if (dto == null) return new OperationResult("重設密碼參數異常");
             if (dto.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0) return new OperationResult("重設密碼逾時");
@@ -359,8 +364,8 @@ namespace EleganceParadisAPI.Services
                 if (!Regex.IsMatch(request.NewPassword, passwordPattern))
                     return new OperationResult("密碼格式有誤");
 
-                var decodeURL = HttpUtility.UrlDecode(request.EncodingParameter);
-                var accountId = DeserializeParameter<ForgetPasswordDTO>(decodeURL).AccountId;
+                var accountId = DeserializeURLEncodeParameter<ForgetPasswordDTO>(request.EncodingParameter).AccountId;
+
                 var account = await _accountRepo.GetByIdAsync(accountId);
                 if (account == null) return new OperationResult("找不到對應的AccountId");
 
