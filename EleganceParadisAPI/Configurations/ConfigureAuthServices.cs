@@ -11,7 +11,7 @@ namespace EleganceParadisAPI.Configurations
     {
         public static IServiceCollection AddAuthServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<JWTHelper>()
+            services.AddScoped<JWTService>()
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options => {
                         options.TokenValidationParameters = new TokenValidationParameters

@@ -16,9 +16,9 @@ namespace EleganceParadisAPI.Controllers
     {
         private readonly AccountService _accountService;
         private readonly IEmailSender _emailSender;
-        private readonly JWTHelper _jwtHelper;
+        private readonly JWTService _jwtHelper;
 
-        public AccountController(AccountService accountService, IEmailSender emailSender, JWTHelper jwtHelper)
+        public AccountController(AccountService accountService, IEmailSender emailSender, JWTService jwtHelper)
         {
             _accountService = accountService;
             _emailSender = emailSender;
@@ -129,7 +129,7 @@ namespace EleganceParadisAPI.Controllers
                 {
                     AccountId = result.ResultDTO.AccountId,
                     Email = result.ResultDTO.Email,
-                    ExpireMinutes = result.ResultDTO.ExpireTime
+                    AccessTokenExpireMinutes = result.ResultDTO.ExpireTime
                 }));
             return BadRequest(result.ErrorMessage);
         }
