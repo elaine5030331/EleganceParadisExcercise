@@ -1,21 +1,25 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using EleganceParadisAPI.DTOs.AuthDTOs;
+using EleganceParadisAPI.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace EleganceParadisAPI.Helpers
+namespace EleganceParadisAPI.Services
 {
     public class JWTService
     {
         private readonly IConfiguration _configuration;
-        private readonly IRepository<AuthTokenHistory> _repository;
+        private readonly IRepository<AuthTokenHistory> _authTokenRepo;
+        private readonly IRepository<Account> _accountRepo;
 
-        public JWTService(IConfiguration configuration, IRepository<AuthTokenHistory> repository)
+        public JWTService(IConfiguration configuration, IRepository<AuthTokenHistory> authTokenRepo, IRepository<Account> accountRepo)
         {
             _configuration = configuration;
-            _repository = repository;
+            _authTokenRepo = authTokenRepo;
+            _accountRepo = accountRepo;
         }
 
         public async Task<GenerateTokenResponse> GenerateToken(GenerateTokenDTO generateTokenDTO)
@@ -73,7 +77,7 @@ namespace EleganceParadisAPI.Helpers
                 CreatAt = DateTimeOffset.UtcNow
             };
 
-            await _repository.AddAsync(entity);
+            await _authTokenRepo.AddAsync(entity);
 
             return new GenerateTokenResponse()
             {
@@ -84,13 +88,32 @@ namespace EleganceParadisAPI.Helpers
             };
 
         }
-    }
 
-    public class GenerateTokenResponse
-    {
-        public int AccountId { get; set; }
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-        public long ExpireTime { get; set; }
+        public async Task LogoutAsync(LogoutRequest request)
+        {
+            var entity = await _authTokenRepo.FirstOrDefaultAsync(x => x.RefreshToken == request.RefreshToken);
+            if (entity == null) return;
+            entity.ExpiredTime = DateTimeOffset.UtcNow;
+            await _authTokenRepo.UpdateAsync(entity);
+        }
+
+        public async Task<GenerateTokenResponse> RefreshTokenAsync(RefreshTokenRequest request)
+        {
+            var entity = await _authTokenRepo.FirstOrDefaultAsync(x => x.RefreshToken == request.RefreshToken && x.AccessToken == request.AccessToken);
+
+            if (entity == null) 
+                throw new ArgumentException("參數異常");
+
+            if (entity.ExpiredTime.CompareTo(DateTimeOffset.UtcNow) < 0)
+                throw new InvalidOperationException("RefreshToken失效");
+
+            var account = await _accountRepo.GetByIdAsync(entity.AccountId);
+
+            return await GenerateToken(new GenerateTokenDTO
+            {
+                AccountId = entity.AccountId,
+                Email = account.Email
+            });
+        }
     }
 }

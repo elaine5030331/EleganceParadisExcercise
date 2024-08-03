@@ -162,8 +162,7 @@ namespace EleganceParadisAPI.Services
                     ResultDTO = new VerifyEmailResponse()
                     {
                         AccountId = account.Id,
-                        Email = account.Email,
-                        ExpireTime = 15
+                        Email = account.Email
                     }
                 };
             }

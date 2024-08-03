@@ -1,4 +1,4 @@
-﻿using EleganceParadisAPI.Helpers;
+﻿using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

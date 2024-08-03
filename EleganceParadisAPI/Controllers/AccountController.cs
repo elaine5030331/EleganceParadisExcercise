@@ -128,8 +128,7 @@ namespace EleganceParadisAPI.Controllers
                 return Ok(_jwtHelper.GenerateToken(new GenerateTokenDTO
                 {
                     AccountId = result.ResultDTO.AccountId,
-                    Email = result.ResultDTO.Email,
-                    AccessTokenExpireMinutes = result.ResultDTO.ExpireTime
+                    Email = result.ResultDTO.Email
                 }));
             return BadRequest(result.ErrorMessage);
         }

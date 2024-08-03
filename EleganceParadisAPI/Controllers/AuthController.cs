@@ -1,5 +1,7 @@
 ﻿using ApplicationCore.Interfaces;
+using EleganceParadisAPI.DTOs.AuthDTOs;
 using EleganceParadisAPI.Helpers;
+using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +12,15 @@ namespace EleganceParadisAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly JWTService _jWT;
+        private readonly JWTService _jwtService;
         private readonly IUserManageService _userManageService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(JWTService jWT, IUserManageService userManageService)
+        public AuthController(JWTService jwtService, IUserManageService userManageService, ILogger<AuthController> logger)
         {
-            _jWT = jWT;
+            _jwtService = jwtService;
             _userManageService = userManageService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,19 +43,46 @@ namespace EleganceParadisAPI.Controllers
             var authRes = await _userManageService.AuthenticateUser(loginInfo.Email, loginInfo.Password);
             if (authRes.IsValid)
             {
-                return Ok(await _jWT.GenerateToken(new GenerateTokenDTO 
+                return Ok(await _jwtService.GenerateToken(new GenerateTokenDTO 
                                                 { AccountId = authRes.AccountId,
-                                                  Email = loginInfo.Email,
-                                                  AccessTokenExpireMinutes = 15
+                                                  Email = loginInfo.Email
                                                 }));
             }
             return BadRequest("帳號或密碼有誤，請重新輸入");
         }
-    }
 
-    public class LoginDTO
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout(LogoutRequest request)
+        {
+            await _jwtService.LogoutAsync(request);
+            return Ok();
+        }
+
+        /// <summary>
+        /// 更新AccessToken
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <response code ="401"></response>
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+        {
+            try
+            {
+                var response = await _jwtService.RefreshTokenAsync(request);
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return Unauthorized();
+            }
+
+        }
     }
 }

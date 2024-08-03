@@ -6,6 +6,5 @@ namespace EleganceParadisAPI.DTOs.AccountDTOs
     {
         public int AccountId { get; set; }
         public string Email { get; set; }
-        public int ExpireTime { get; set; }
     }
 }
