@@ -177,5 +177,23 @@ namespace EleganceParadisAPI.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        /// <summary>
+        /// 重發註冊驗證信
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <response code ="200">信件已寄出</response>
+        /// <response code ="400">
+        /// 1. 找不到此用戶
+        /// 2. 此帳戶已驗證過
+        /// </response>
+        [HttpPost("ResendVerifyEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerifyEmail(ResendVerifyEmailRequest request)
+        {
+            var result = await _accountService.ResendVerifyEmailAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }

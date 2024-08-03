@@ -93,7 +93,7 @@ namespace EleganceParadisAPI.Services
                 AccountId = account.Id
             };
 
-            await SendVerifyEmailHandler(registInfo, account);
+            await SendVerifyEmailHandler(account);
 
             return new OperationResult<CreateAccountResultDTO>(result);
         }
@@ -101,10 +101,9 @@ namespace EleganceParadisAPI.Services
         /// <summary>
         /// 寄發驗證信
         /// </summary>
-        /// <param name="registInfo"></param>
         /// <param name="account"></param>
         /// <returns></returns>
-        private async Task SendVerifyEmailHandler(RegistDTO registInfo, Account account)
+        private async Task SendVerifyEmailHandler(Account account)
         {
             var verifyDTO = new VerifyEmailDTO()
             {
@@ -117,15 +116,16 @@ namespace EleganceParadisAPI.Services
             //QueryHelpers.AddQueryString 回傳 URLEncode後的結果
             var returnURL = QueryHelpers.AddQueryString(uri, "p", serializeStr);
 
-            var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
+            var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(account.Name, returnURL);
             await _emailSender.SendAsync(new EmailDTO
             {
-                MailTo = registInfo.Name,
-                MailToEmail = registInfo.Email,
+                MailTo = account.Name,
+                MailToEmail = account.Email,
                 Subject = "EleganceParadis 註冊驗證信",
                 HTMLContent = mailTemplate
             });
         }
+
 
         /// <summary>
         /// 將物件序列化為base64 string
@@ -381,6 +381,24 @@ namespace EleganceParadisAPI.Services
             {
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult("重設密碼失敗");
+            }
+        }
+
+        public async Task<OperationResult> ResendVerifyEmailAsync(ResendVerifyEmailRequest request)
+        {
+            var account = await _accountRepo.FirstOrDefaultAsync(a => a.Email == request.Email);
+
+            if (account == null) 
+                return new OperationResult("找不到此用戶");
+
+            if (account.Status != AccountStatus.Unverified)
+            {
+                return new OperationResult("此帳戶已驗證過");
+            }
+            else
+            {
+                await SendVerifyEmailHandler(account);
+                return new OperationResult();
             }
         }
     }
