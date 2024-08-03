@@ -1,8 +1,16 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.DTOs;
+using ApplicationCore.Entities;
+using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using EleganceParadisAPI.DTOs;
+using EleganceParadisAPI.DTOs.AccountDTOs;
+using EleganceParadisAPI.Helpers;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 using static ApplicationCore.Entities.Account;
 
 namespace EleganceParadisAPI.Services
@@ -14,12 +22,31 @@ namespace EleganceParadisAPI.Services
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
         private const string mobilePattern = @"^09\d{8}$";
         private const string emailPattern = @".*@.*\..*";
+        private readonly IEmailSender _emailSender;
+        private readonly ILogger<AccountService> _logger;
+        private readonly SendEmailSettings _sendEmailSettins;
 
-        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher)
+        public AccountService(IRepository<Account> accountRepo, IApplicationPasswordHasher applicationPasswordHasher, IEmailSender emailSender, ILogger<AccountService> logger, SendEmailSettings sendEmailSettings)
         {
             _accountRepo = accountRepo;
             _applicationPasswordHasher = applicationPasswordHasher;
+            _emailSender = emailSender;
+            _logger = logger;
+            _sendEmailSettins = sendEmailSettings;
         }
+
+        private class VerifyEmailDTO
+        {
+            public int AccountId { get; set; }
+            public DateTimeOffset ExpireTime { get; set; }
+        }
+
+        private class ForgetPasswordDTO
+        {
+            public int AccountId { get; set; }
+            public DateTimeOffset ExpireTime { get; set; }
+        }
+
 
         public async Task<OperationResult<CreateAccountResultDTO>> CreateAccount(RegistDTO registInfo)
         {
@@ -65,9 +92,115 @@ namespace EleganceParadisAPI.Services
                 Name = registInfo.Name,
                 AccountId = account.Id
             };
-            return new OperationResult<CreateAccountResultDTO>(result);
 
+            await SendVerifyEmailHandler(registInfo, account);
+
+            return new OperationResult<CreateAccountResultDTO>(result);
         }
+
+        /// <summary>
+        /// 寄發驗證信
+        /// </summary>
+        /// <param name="registInfo"></param>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        private async Task SendVerifyEmailHandler(RegistDTO registInfo, Account account)
+        {
+            var verifyDTO = new VerifyEmailDTO()
+            {
+                AccountId = account.Id,
+                ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
+            };
+            string serializeStr = SerializeInput(verifyDTO);
+
+            var uri = new Uri(_sendEmailSettins.VerifyEmailReturnURL).GetLeftPart(UriPartial.Path);
+            //QueryHelpers.AddQueryString 回傳 URLEncode後的結果
+            var returnURL = QueryHelpers.AddQueryString(uri, "p", serializeStr);
+
+            var mailTemplate = EmailTemplateHelper.SignupEmailTemplate(registInfo.Name, returnURL);
+            await _emailSender.SendAsync(new EmailDTO
+            {
+                MailTo = registInfo.Name,
+                MailToEmail = registInfo.Email,
+                Subject = "EleganceParadis 註冊驗證信",
+                HTMLContent = mailTemplate
+            });
+        }
+
+        /// <summary>
+        /// 將物件序列化為base64 string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static string SerializeInput<T>(T input) where T : class
+        {
+            var byteArr = JsonSerializer.SerializeToUtf8Bytes(input);
+            var base64Str = Convert.ToBase64String(byteArr);
+            return base64Str;
+        }
+
+        public async Task<OperationResult<VerifyEmailResponse>> VerifyEmailAsync(string encodingParameter)
+        {
+            try
+            {
+                var verifyDTO = DeserializeURLEncodeParameter<VerifyEmailDTO>(encodingParameter);
+
+                if (verifyDTO == null)
+                    return new OperationResult<VerifyEmailResponse>("註冊驗證參數異常");
+
+                if (verifyDTO.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0)
+                    return new OperationResult<VerifyEmailResponse>("註冊驗證逾時");
+
+                var account = await _accountRepo.GetByIdAsync(verifyDTO.AccountId);
+                account.Status = AccountStatus.Verified;
+                await _accountRepo.UpdateAsync(account);
+
+                return new OperationResult<VerifyEmailResponse>()
+                {
+                    IsSuccess = true,
+                    ResultDTO = new VerifyEmailResponse()
+                    {
+                        AccountId = account.Id,
+                        Email = account.Email,
+                        ExpireTime = 15
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult<VerifyEmailResponse>("註冊驗證失敗");
+            }
+        }
+
+        /// <summary>
+        /// 反序列化base64 string to Object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="base64Str"></param>
+        /// <returns></returns>
+        private T DeserializeParameter<T>(string base64Str) where T : class
+        {
+            try
+            {
+                var byteArr = Convert.FromBase64String(base64Str);
+                var output = JsonSerializer.Deserialize<T>(byteArr);
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return null;
+            }
+        }
+
+        private T DeserializeURLEncodeParameter<T>(string encodeParameter) where T : class
+        {
+            var decode = HttpUtility.UrlDecode(encodeParameter);
+            return DeserializeParameter<T>(decode);
+        }
+
 
         public async Task<GetAccountInfoDTO> GetAccountInfo(int accountId)
         {
@@ -155,7 +288,7 @@ namespace EleganceParadisAPI.Services
 
             var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
 
-            if (account == null) 
+            if (account == null)
                 return new OperationResult<UpdateAccountPasswordResult>("查無此人");
 
             if (!_applicationPasswordHasher.VerifyPassword(account.Password, accountInfo.OldPassword))
@@ -171,5 +304,84 @@ namespace EleganceParadisAPI.Services
             return new OperationResult<UpdateAccountPasswordResult>(updatedResult);
         }
 
+        public async Task<OperationResult> ForgetPasswordAsync(string email)
+        {
+            try
+            {
+                var account = await _accountRepo.FirstOrDefaultAsync(x => x.Email == email);
+                if (account == null) return new OperationResult("找不到對應的AccountId");
+
+                var forgetPasswordDTO = new ForgetPasswordDTO
+                {
+                    AccountId = account.Id,
+                    ExpireTime = DateTimeOffset.UtcNow.AddMinutes(15),
+                };
+
+                var urlEncode = SerializeInput(forgetPasswordDTO);
+
+                var uri = new Uri(_sendEmailSettins.ForgetPasswordReturnURL).GetLeftPart(UriPartial.Path);
+                var returnURL = QueryHelpers.AddQueryString(uri, "p", urlEncode);
+
+                var mailTemplate = EmailTemplateHelper.ForgetPasswordEmailTemplate(account.Name, returnURL);
+                await _emailSender.SendAsync(new EmailDTO
+                {
+                    MailTo = account.Name,
+                    MailToEmail = email,
+                    Subject = "重設密碼驗證信",
+                    HTMLContent = mailTemplate
+                });
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("重設密碼驗證信寄發失敗");
+            }
+        }
+
+        public async Task<OperationResult> VerifyForgetPasswordAsync(string encodingParameter)
+        {
+            var dto = DeserializeURLEncodeParameter<ForgetPasswordDTO>(encodingParameter);
+
+            if (dto == null) return new OperationResult("重設密碼參數異常");
+            if (dto.ExpireTime.CompareTo(DateTimeOffset.UtcNow) < 0) return new OperationResult("重設密碼逾時");
+
+            var account = await _accountRepo.GetByIdAsync(dto.AccountId);
+            if (account == null) return new OperationResult("無法找到對應的AccountId");
+
+            return new OperationResult();
+        }
+
+        public async Task<OperationResult> ResetAccountPasswordAsync(ResetAccountPasswordDTO request)
+        {
+            try
+            {   
+                var verifyResult = await VerifyForgetPasswordAsync(request.EncodingParameter);
+                if (!verifyResult.IsSuccess)
+                    return verifyResult;
+
+                if (!Regex.IsMatch(request.NewPassword, passwordPattern))
+                    return new OperationResult("密碼格式有誤");
+
+                var accountId = DeserializeURLEncodeParameter<ForgetPasswordDTO>(request.EncodingParameter).AccountId;
+
+                var account = await _accountRepo.GetByIdAsync(accountId);
+                if (account == null) return new OperationResult("找不到對應的AccountId");
+
+                if (_applicationPasswordHasher.VerifyPassword(account.Password, request.NewPassword))
+                    return new OperationResult("與舊密碼相同");
+
+                account.Password = _applicationPasswordHasher.HashPassword(request.NewPassword);
+                await _accountRepo.UpdateAsync(account);
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("重設密碼失敗");
+            }
+        }
     }
 }

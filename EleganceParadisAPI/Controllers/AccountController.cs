@@ -1,4 +1,6 @@
-﻿using EleganceParadisAPI.DTOs;
+﻿using ApplicationCore.Interfaces;
+using EleganceParadisAPI.DTOs;
+using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +15,14 @@ namespace EleganceParadisAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly AccountService _accountService;
+        private readonly IEmailSender _emailSender;
+        private readonly JWTHelper _jwtHelper;
 
-        public AccountController(AccountService accountService)
+        public AccountController(AccountService accountService, IEmailSender emailSender, JWTHelper jwtHelper)
         {
             _accountService = accountService;
+            _emailSender = emailSender;
+            _jwtHelper = jwtHelper;
         }
 
         /// <summary>
@@ -52,10 +58,10 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> GetAccount(int? id)
         {
             int accountId;
-           
+
 
             if (!id.HasValue)
-            {  
+            {
                 var getAccountIdRes = User.GetAccountId();
                 if (getAccountIdRes == null) return BadRequest("查無此人");
                 accountId = getAccountIdRes.Value;
@@ -99,5 +105,44 @@ namespace EleganceParadisAPI.Controllers
             if (result.IsSuccess) return NoContent();
             else return BadRequest(result.ErrorMessage);
         }
+
+        [HttpGet("VerifyEmail/{encodingParameter}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail(string encodingParameter)
+        {
+            var result = await _accountService.VerifyEmailAsync(encodingParameter);
+            if (result.IsSuccess)
+                return Ok(_jwtHelper.GenerateToken(new GenerateTokenDTO
+                {
+                    AccountId = result.ResultDTO.AccountId,
+                    Email = result.ResultDTO.Email,
+                    ExpireMinutes = result.ResultDTO.ExpireTime
+                }));
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost("ForgetPassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        {
+            var result = await _accountService.ForgetPasswordAsync(forgetPasswordDTO.Email);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost("ResetAccountPassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordDTO resetAccountPasswordDTO)
+        {
+            //var verifyResult = await _accountService.VerifyForgetPasswordAsync(resetAccountPasswordDTO.EncodingParameter);
+            //if (!verifyResult.IsSuccess) 
+            //    return BadRequest(verifyResult.ErrorMessage);
+
+            var result = await _accountService.ResetAccountPasswordAsync(resetAccountPasswordDTO);
+            
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
     }
 }
