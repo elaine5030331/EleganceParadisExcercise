@@ -1,4 +1,6 @@
-﻿namespace EleganceParadisAPI.DTOs.AuthDTOs
+﻿using static ApplicationCore.Entities.Account;
+
+namespace EleganceParadisAPI.DTOs.AuthDTOs
 {
     public class GenerateTokenResponse
     {
@@ -6,5 +8,6 @@
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public long ExpireTime { get; set; }
+        public AccountStatus AccountStatus { get; set; } 
     }
 }

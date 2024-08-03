@@ -107,7 +107,7 @@ namespace EleganceParadisAPI.Controllers
         }
 
         /// <summary>
-        /// 發送註冊驗證信
+        /// 驗證會員
         /// </summary>
         /// <param name="encodingParameter"></param>
         /// <returns></returns>
@@ -125,7 +125,7 @@ namespace EleganceParadisAPI.Controllers
         {
             var result = await _accountService.VerifyEmailAsync(encodingParameter);
             if (result.IsSuccess)
-                return Ok(_jwtHelper.GenerateToken(new GenerateTokenDTO
+                return Ok(await _jwtHelper.GenerateToken(new GenerateTokenDTO
                 {
                     AccountId = result.ResultDTO.AccountId,
                     Email = result.ResultDTO.Email

@@ -34,7 +34,8 @@ namespace EleganceParadisAPI.Controllers
         ///         "accountId": 2,
         ///         "accessToken":"JWT token",
         ///         "refreshToken": "e320d0affae5473da7860d51dce66e43",
-        ///         "expireTime": 1723304825
+        ///         "expireTime": 1723304825,
+        ///         "accountStatus": 2  //Unverified = 1, Verified = 2, Blacklist = 3
         ///     }
         /// </remarks>
         [HttpPost("Login")]

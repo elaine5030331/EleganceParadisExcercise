@@ -24,6 +24,14 @@ namespace EleganceParadisAPI.Services
 
         public async Task<GenerateTokenResponse> GenerateToken(GenerateTokenDTO generateTokenDTO)
         {
+            var account = await _accountRepo.GetByIdAsync(generateTokenDTO.AccountId);
+            if (account == null || account.Status != Account.AccountStatus.Verified)
+                return new GenerateTokenResponse()
+                {
+                    AccountId = generateTokenDTO.AccountId,
+                    AccountStatus = account.Status,
+                };
+
             var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
             var signKey = _configuration.GetValue<string>("JwtSettings:SignKey");
 
@@ -84,7 +92,8 @@ namespace EleganceParadisAPI.Services
                 AccountId = generateTokenDTO.AccountId,
                 AccessToken = serializeToken,
                 RefreshToken = refreshToken,
-                ExpireTime = expireTime.ToUnixTimeSeconds()
+                ExpireTime = expireTime.ToUnixTimeSeconds(),
+                AccountStatus = account.Status
             };
 
         }
