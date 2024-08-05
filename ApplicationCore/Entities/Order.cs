@@ -17,6 +17,11 @@ public partial class Order
 
     public string PurchaserEmail { get; set; } = null!;
 
+    /// <summary>
+    /// 0 = LinePay, 1 = ECPay
+    /// </summary>
+    public int PaymentType { get; set; }
+
     public int OrderStatus { get; set; }
 
     public DateTimeOffset CreateAt { get; set; }

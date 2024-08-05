@@ -79,6 +79,7 @@ public partial class EleganceParadisContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
+            entity.Property(e => e.PaymentType).HasComment("0 = LinePay, 1 = ECPay");
             entity.Property(e => e.Purchaser).HasMaxLength(256);
             entity.Property(e => e.PurchaserTel).HasMaxLength(50);
 
