@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ApplicationCore.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace ApplicationCore.Entities;
@@ -22,13 +23,11 @@ public partial class Order
     /// </summary>
     public int PaymentType { get; set; }
 
-    public int OrderStatus { get; set; }
+    public OrderStatus OrderStatus { get; set; }
 
     public DateTimeOffset CreateAt { get; set; }
 
     public string City { get; set; } = null!;
-
-    public string County { get; set; } = null!;
 
     public string District { get; set; } = null!;
 
