@@ -2,6 +2,7 @@
 {
     public class ProductQueryResultDTO
     {
+        public int CategoryId { get; set; }
         public int ProductId { get; set; }
         public string CategoryName { get; set; }
         public string ProductName { get; set; }
@@ -20,6 +21,7 @@
     }
     public class ProductDTO
     {
+        public int CategoryId { get; set; }
         public int ProductId { get; set; }
         public string CategoryName { get; set; }
         public string ProductName { get; set; }

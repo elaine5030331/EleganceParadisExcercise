@@ -27,6 +27,7 @@ namespace Infrastructure.Data.Services
 	                                        GROUP BY ProductId
                                         )
                                         SELECT 
+                                            Categories.Id AS CategoryId,
                                             Products.Id AS ProductId,
                                             Categories.Name AS CategoryName,
                                             ProductName,
@@ -54,6 +55,7 @@ namespace Infrastructure.Data.Services
             var parameter = new { ProductId = productId };
             var sql = @"
                         SELECT 
+                            Categories.Id AS CategoryId,
 	                        Products.Id AS ProductId,
 	                        Categories.Name AS CategoryName,
 	                        ProductName,
@@ -87,6 +89,7 @@ namespace Infrastructure.Data.Services
             var product = queryResult[0];
             var result = new ProductDTO
             {
+                CategoryId = product.CategoryId,
                 ProductId = productId,
                 CategoryName = product.CategoryName,
                 ProductName = product.ProductName,
