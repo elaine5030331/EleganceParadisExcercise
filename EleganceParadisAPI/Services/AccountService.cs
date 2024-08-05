@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.DTOs;
 using ApplicationCore.Entities;
+using ApplicationCore.Enums;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
@@ -7,6 +8,7 @@ using EleganceParadisAPI.DTOs;
 using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -20,8 +22,6 @@ namespace EleganceParadisAPI.Services
         private readonly IRepository<Account> _accountRepo;
         private readonly IApplicationPasswordHasher _applicationPasswordHasher;
         private const string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,20}$";
-        private const string mobilePattern = @"^09\d{8}$";
-        private const string emailPattern = @".*@.*\..*";
         private readonly IEmailSender _emailSender;
         private readonly ILogger<AccountService> _logger;
         private readonly SendEmailSettings _sendEmailSettins;
@@ -58,13 +58,13 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<CreateAccountResultDTO>("請輸入姓名");
             }
-            if (!Regex.IsMatch(registInfo.Mobile, mobilePattern))
+            if (!ValidateHelper.TryValidateMobile(registInfo.Mobile, out var mobileErrorMsg))
             {
-                return new OperationResult<CreateAccountResultDTO>("電話號碼格式有誤");
+                return new OperationResult<CreateAccountResultDTO>(mobileErrorMsg);
             }
-            if (!Regex.IsMatch(registInfo.Email, emailPattern))
+            if (!ValidateHelper.TryValidateEmail(registInfo.Email, out var emailErrorMsg))
             {
-                return new OperationResult<CreateAccountResultDTO>("電子郵件格式有誤");
+                return new OperationResult<CreateAccountResultDTO>(emailErrorMsg);
             }
             if (!Regex.IsMatch(registInfo.Password, passwordPattern))
             {
@@ -242,13 +242,13 @@ namespace EleganceParadisAPI.Services
             {
                 return new OperationResult<UpdateAcoountInfoResult>("請輸入名字");
             }
-            if (!Regex.IsMatch(accountInfo.Email, emailPattern))
+            if (!ValidateHelper.TryValidateEmail(accountInfo.Email, out var emailErrorMsg))
             {
-                return new OperationResult<UpdateAcoountInfoResult>("電子信箱格式有誤");
+                return new OperationResult<UpdateAcoountInfoResult>(emailErrorMsg);
             }
-            if (!Regex.IsMatch(accountInfo.Mobile, mobilePattern))
+            if (!ValidateHelper.TryValidateMobile(accountInfo.Mobile, out var mobileErrorMsg))
             {
-                return new OperationResult<UpdateAcoountInfoResult>("手機號格式有誤");
+                return new OperationResult<UpdateAcoountInfoResult>(mobileErrorMsg);
             }
             var account = await _accountRepo.GetByIdAsync(accountInfo.AccountId);
 

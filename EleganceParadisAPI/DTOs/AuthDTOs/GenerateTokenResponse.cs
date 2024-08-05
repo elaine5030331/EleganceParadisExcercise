@@ -1,5 +1,4 @@
-﻿using static ApplicationCore.Entities.Account;
-
+﻿using ApplicationCore.Enums;
 namespace EleganceParadisAPI.DTOs.AuthDTOs
 {
     public class GenerateTokenResponse

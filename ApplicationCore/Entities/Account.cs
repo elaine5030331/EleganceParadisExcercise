@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ApplicationCore.Enums;
 
 namespace ApplicationCore.Entities;
 
@@ -27,10 +28,5 @@ public partial class Account
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-    public enum AccountStatus
-    {
-        Unverified = 1,
-        Verified = 2,
-        Blacklist = 3
-    }
+    
 }

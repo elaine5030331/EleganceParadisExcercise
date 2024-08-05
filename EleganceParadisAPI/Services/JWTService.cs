@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Entities;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using EleganceParadisAPI.DTOs.AuthDTOs;
 using EleganceParadisAPI.Helpers;
@@ -25,7 +26,7 @@ namespace EleganceParadisAPI.Services
         public async Task<GenerateTokenResponse> GenerateToken(GenerateTokenDTO generateTokenDTO)
         {
             var account = await _accountRepo.GetByIdAsync(generateTokenDTO.AccountId);
-            if (account == null || account.Status != Account.AccountStatus.Verified)
+            if (account == null || account.Status != AccountStatus.Verified)
                 return new GenerateTokenResponse()
                 {
                     AccountId = generateTokenDTO.AccountId,
