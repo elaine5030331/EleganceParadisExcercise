@@ -1,7 +1,9 @@
 
 using ApplicationCore.Models;
+using Coravel;
 using EleganceParadisAPI.Configurations;
 using Infrastructure.Data;
+using Infrastructure.Schedules;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -79,15 +81,19 @@ namespace EleganceParadisAPI
                             .AddWebAPIServices()
                             .AddAuthServices(builder.Configuration);
 
+            builder.Services.AddScheduler();
+
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-            }
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            app.Services.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<OrderInvalidJob>().Hourly();
+            });
             app.UseHttpsRedirection();
             app.UseCors();
             app.UseAuthorization();

@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Services;
 using EleganceParadisAPI.Services;
 using Infrastructure.Data.Services;
+using Infrastructure.Schedules;
 
 namespace EleganceParadisAPI.Configurations
 {
@@ -9,6 +10,7 @@ namespace EleganceParadisAPI.Configurations
         public static IServiceCollection AddWebAPIServices(this IServiceCollection services)
         {
             services.AddScoped<AccountService>();
+            services.AddTransient<OrderInvalidJob>();
             return services;
         }
     }
