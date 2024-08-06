@@ -68,5 +68,15 @@ namespace EleganceParadisAPI.Controllers
         {
             return Ok(await _orderService.GerOrderListAsync(accountId));
         }
+
+        [HttpGet("GetOrderListByStatus/{accountId}")]
+        public async Task<IActionResult> GetOrderListByStatus(int accountId)
+        {
+            var orders = await _orderService.GerOrderListAsync(accountId);
+
+            var result = orders.GroupBy(o => o.OrderStatus).OrderBy(o => o.Key).ToList();
+
+            return Ok(result);
+        }
     }
 }
