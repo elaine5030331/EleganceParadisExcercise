@@ -62,7 +62,7 @@ namespace ApplicationCore.Services
 
                     if (cart.Quantity > spec.StockQuantity)
                     {
-                        errorMessage.Add($"{productName}庫存量不夠");
+                        errorMessage.Add($"{productName}庫存量不夠，庫存剩餘{spec.StockQuantity}");
                         continue;
                     }
 
