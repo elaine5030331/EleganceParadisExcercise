@@ -57,5 +57,16 @@ namespace EleganceParadisAPI.Controllers
             if(result == null) return NotFound();
             return Ok(result);
         }
+
+        /// <summary>
+        /// 取得訂單列表，無訂單內容會回傳空陣列
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        [HttpGet("GetOrderList/{accountId}")]
+        public async Task<IActionResult> GetOrderList(int accountId)
+        {
+            return Ok(await _orderService.GerOrderListAsync(accountId));
+        }
     }
 }

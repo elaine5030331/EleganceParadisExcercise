@@ -148,13 +148,18 @@ namespace ApplicationCore.Services
         public async Task<OrderResponse> GerOrderAsync(int orderId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
-            if(order == null) return null;
+            if (order == null) return null;
             var orderDetails = await _orderDetailRepository.ListAsync(o => o.OrderId == orderId);
-            if(orderDetails == null) return null;
+            if (orderDetails == null) return null;
 
+            return GetOrderResponse(order, orderDetails);
+        }
+
+        private static OrderResponse GetOrderResponse(Order order, List<OrderDetail> orderDetails)
+        {
             return new OrderResponse()
             {
-                OrderId = orderId,
+                OrderId = order.Id,
                 AccountId = order.AccountId,
                 OrderNo = order.OrderNo,
                 Purchaser = order.Purchaser,
@@ -164,7 +169,7 @@ namespace ApplicationCore.Services
                 OrderStatus = order.OrderStatus,
                 CreateTime = order.CreateAt.AddHours(8).ToString("yyyy/MM/dd"),
                 Address = $"{order.City}{order.District}{order.Address}",
-                OrderDetails = orderDetails.Select(od => new OrderDetailDTO()
+                OrderDetails = orderDetails.OrderBy(od => od.Sequence).Select(od => new OrderDetailDTO()
                 {
                     ProductName = od.ProductName,
                     Sku = od.Sku,
@@ -176,7 +181,23 @@ namespace ApplicationCore.Services
 
         public async Task<List<OrderResponse>> GerOrderListAsync(int accountId)
         {
-            throw new NotImplementedException();
+            var orders = (await _orderRepository.ListAsync(o => o.AccountId == accountId))
+                                                .OrderByDescending(o => o.CreateAt)
+                                                .ToList();
+            if (orders.Count == 0) return new List<OrderResponse>();
+
+            var allOrderDetails = await _orderDetailRepository.ListAsync(od => orders.Select(o => o.Id).Contains(od.OrderId));
+
+            var result = new List<OrderResponse>();
+            foreach(var order in orders)
+            {
+                var orderDetails = allOrderDetails.Where(od => od.OrderId == order.Id).ToList();
+
+                result.Add(GetOrderResponse(order, orderDetails));
+            }
+
+            return result;
+            
         }
     }
 }
