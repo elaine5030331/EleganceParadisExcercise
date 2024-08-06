@@ -10,6 +10,8 @@ namespace ApplicationCore.Interfaces
 {
     public interface IOrderService
     {
-        public Task<OperationResult<CreateOrderResponse>> CreateOrder(CreateOrderRequest request);
+        Task<OperationResult<CreateOrderResponse>> CreateOrderAsync(CreateOrderRequest request);
+        Task<List<OrderResponse>> GerOrderListAsync(int accountId);
+        Task<OrderResponse> GerOrderAsync(int orderId);
     }
 }

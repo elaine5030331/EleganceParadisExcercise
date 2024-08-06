@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Entities;
+using ApplicationCore.Enums;
 using ApplicationCore.Models;
 
 namespace ApplicationCore.DTOs.CartDTO
@@ -24,7 +25,7 @@ namespace ApplicationCore.DTOs.CartDTO
 
     public class PaymentType
     {
-        public PaymentTypes Type { get; set; }
+        public Enums.PaymentType Type { get; set; }
         public string DisplayName { get; set; }
         public string Icon { get; set; }
     }
@@ -49,11 +50,5 @@ namespace ApplicationCore.DTOs.CartDTO
         public string SpecName { get; set; }
         public decimal UnitPrice { get; set; }
         public int? Stock { get; set; }
-    }
-
-    public enum PaymentTypes
-    {
-        LinePay = 0,
-        ECPay = 1
     }
 }

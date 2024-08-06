@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Enums;
+﻿using ApplicationCore.DTOs.CartDTO;
+using ApplicationCore.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ public partial class Order
     /// <summary>
     /// 0 = LinePay, 1 = ECPay
     /// </summary>
-    public int PaymentType { get; set; }
+    public Enums.PaymentType PaymentType { get; set; }
 
     public OrderStatus OrderStatus { get; set; }
 

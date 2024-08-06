@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.DTOs.CartDTO;
 using ApplicationCore.Entities;
+using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Microsoft.Extensions.Logging;
@@ -273,13 +274,13 @@ namespace ApplicationCore.Services
         /// 取得付款方式
         /// </summary>
         /// <returns></returns>
-        private List<PaymentType> GetPaymentTypes()
+        private List<DTOs.CartDTO.PaymentType> GetPaymentTypes()
         {
-            return new List<PaymentType>
+            return new List<DTOs.CartDTO.PaymentType>
             {
-                new PaymentType()
+                new DTOs.CartDTO.PaymentType()
                 {
-                    Type = PaymentTypes.LinePay,
+                    Type = Enums.PaymentType.LinePay,
                     DisplayName = "LinePay",
                     Icon = string.Empty
                 }

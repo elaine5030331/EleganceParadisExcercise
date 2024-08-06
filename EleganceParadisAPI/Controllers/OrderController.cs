@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.DTOs.OrderDTOS;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace EleganceParadisAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -37,9 +39,23 @@ namespace EleganceParadisAPI.Controllers
             if (string.IsNullOrEmpty(request.District)) return BadRequest("請輸入行政區");
             if (string.IsNullOrEmpty(request.Address)) return BadRequest("請輸入地址");
 
-            var result = await _orderService.CreateOrder(request);
+            var result = await _orderService.CreateOrderAsync(request);
             if(result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
+        }
+
+        /// <summary>
+        /// 取得單筆訂單
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        /// <response code ="404">找不到此訂單</response>
+        [HttpGet("GetOrder/{orderId}")]
+        public async Task<IActionResult> GetOrder(int orderId)
+        {
+            var result = await _orderService.GerOrderAsync(orderId);
+            if(result == null) return NotFound();
+            return Ok(result);
         }
     }
 }

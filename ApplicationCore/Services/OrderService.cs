@@ -33,7 +33,7 @@ namespace ApplicationCore.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OperationResult<CreateOrderResponse>> CreateOrder(CreateOrderRequest request)
+        public async Task<OperationResult<CreateOrderResponse>> CreateOrderAsync(CreateOrderRequest request)
         {
             await _unitOfWork.BeginAsync();
             try
@@ -143,6 +143,40 @@ namespace ApplicationCore.Services
                 _unitOfWork.Dispose();
             }
            
+        }
+
+        public async Task<OrderResponse> GerOrderAsync(int orderId)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId);
+            if(order == null) return null;
+            var orderDetails = await _orderDetailRepository.ListAsync(o => o.OrderId == orderId);
+            if(orderDetails == null) return null;
+
+            return new OrderResponse()
+            {
+                OrderId = orderId,
+                AccountId = order.AccountId,
+                OrderNo = order.OrderNo,
+                Purchaser = order.Purchaser,
+                PurchaserEmail = order.PurchaserEmail,
+                PurchaserTel = order.PurchaserTel,
+                PaymentType = order.PaymentType,
+                OrderStatus = order.OrderStatus,
+                CreateTime = order.CreateAt.AddHours(8).ToString("yyyy/MM/dd"),
+                Address = $"{order.City}{order.District}{order.Address}",
+                OrderDetails = orderDetails.Select(od => new OrderDetailDTO()
+                {
+                    ProductName = od.ProductName,
+                    Sku = od.Sku,
+                    Quantity = od.Quantity,
+                    UnitPrice = od.UnitPrice
+                }).ToList()
+            };
+        }
+
+        public async Task<List<OrderResponse>> GerOrderListAsync(int accountId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
