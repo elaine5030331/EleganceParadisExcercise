@@ -20,24 +20,27 @@ namespace ApplicationCore.Services
         private readonly IRepository<Spec> _specRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly ILogger<OrderService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrderService(IRepository<Order> orderRepository, IRepository<OrderDetail> orderDetailRepository, IRepository<Cart> cartRepository, IRepository<Spec> specRepository, IRepository<Product> productRepository, ILogger<OrderService> logger)
+        public OrderService(ILogger<OrderService> logger, IUnitOfWork unitOfWork)
         {
-            _orderRepository = orderRepository;
-            _orderDetailRepository = orderDetailRepository;
-            _cartRepository = cartRepository;
-            _specRepository = specRepository;
-            _productRepository = productRepository;
+            _orderRepository = unitOfWork.GetRepository<Order>();
+            _orderDetailRepository = unitOfWork.GetRepository<OrderDetail>();
+            _cartRepository = unitOfWork.GetRepository<Cart>();
+            _specRepository = unitOfWork.GetRepository<Spec>();
+            _productRepository = unitOfWork.GetRepository<Product>();
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<OperationResult<CreateOrderResponse>> CreateOrder(CreateOrderRequest request)
         {
+            await _unitOfWork.BeginAsync();
             try
             {
                 //取得購物車內容
                 var carts = await _cartRepository.ListAsync(c => c.AccountId == request.AccountId);
-                if (carts.Count == 0) 
+                if (carts.Count == 0)
                     return new OperationResult<CreateOrderResponse>("目前購物車沒有商品");
 
                 var specs = await _specRepository.ListAsync(s => carts.Select(x => x.SpecId).Contains(s.Id));
@@ -55,7 +58,7 @@ namespace ApplicationCore.Services
 
                     if(spec.StockQuantity == null) continue;
 
-                    var productName = $"{products.FirstOrDefault(p => p.Id == spec.ProductId)?.ProductName ?? string.Empty}_{spec.SpecName}" ;
+                    var productName = $"{products.FirstOrDefault(p => p.Id == spec.ProductId)?.ProductName ?? string.Empty}({spec.SpecName})" ;
 
                     if (cart.Quantity > spec.StockQuantity)
                     {
@@ -114,6 +117,8 @@ namespace ApplicationCore.Services
                 //刪除購物車
                 await _cartRepository.DeleteRangeAsync(carts);
 
+                await _unitOfWork.CommitAsync();
+
                 return new OperationResult<CreateOrderResponse>()
                 {
                     IsSuccess = true,
@@ -125,12 +130,17 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackAsync();
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult<CreateOrderResponse>()
                 {
                     IsSuccess = false,
                     ErrorMessage = "訂單成立失敗"
                 };
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
             }
            
         }
