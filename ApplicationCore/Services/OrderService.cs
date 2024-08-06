@@ -167,7 +167,8 @@ namespace ApplicationCore.Services
                 PurchaserTel = order.PurchaserTel,
                 PaymentType = order.PaymentType,
                 OrderStatus = order.OrderStatus,
-                CreateTime = order.CreateAt.AddHours(8).ToString("yyyy/MM/dd"),
+                OredreDate = order.CreateAt.AddHours(8).ToString("yyyy/MM/dd"),
+                CreateAt = order.CreateAt.ToUnixTimeSeconds(),
                 Address = $"{order.City}{order.District}{order.Address}",
                 OrderDetails = orderDetails.OrderBy(od => od.Sequence).Select(od => new OrderDetailDTO()
                 {

@@ -50,6 +50,36 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="orderId"></param>
         /// <returns></returns>
         /// <response code ="404">找不到此訂單</response>
+        /// <remarks>
+        /// Sample request:<br/>
+        /// {
+        ///     "orderId": 1,
+        ///     "accountId": 2,
+        ///     "orderNo": "EP20240806005528941"(訂單編號),
+        ///     "purchaser": "test",
+        ///     "purchaserEmail": "test@gmail.com",
+        ///     "purchaserTel": "0988888888",
+        ///     "paymentType": 0,(0 = LinePay, 1 = ECPay)
+        ///     "orderStatus": 1,( Pending = 0, Paid = 1, Failed = 10)
+        ///     "oredreDate": "2024/08/06",
+        ///     "createAt": 1722876928,(時間戳)
+        ///     "address": "City + District + Address",
+        ///     "orderDetails": [
+        ///       {
+        ///         "productName": "木質調香水_100ml",
+        ///         "sku": "MPFWOOD_100",
+        ///         "unitPrice": 7777,
+        ///         "quantity": 3
+        ///       },
+        ///       {
+        ///         "productName": "木質調香水_50ml",
+        ///         "sku": "MPFWOOD_50",
+        ///         "unitPrice": 999,
+        ///         "quantity": 3
+        ///       }
+        ///     ]
+        /// }
+        /// </remarks>
         [HttpGet("GetOrder/{orderId}")]
         public async Task<IActionResult> GetOrder(int orderId)
         {

@@ -12,7 +12,14 @@ namespace ApplicationCore.DTOs.OrderDTOS
         public string PurchaserTel { get; set; }
         public PaymentType PaymentType { get; set; }
         public OrderStatus OrderStatus { get; set; }
-        public string CreateTime { get; set; }
+        /// <summary>
+        /// yyyy/MM/dd
+        /// </summary>
+        public string OredreDate { get; set; }
+        /// <summary>
+        /// 時間戳
+        /// </summary>
+        public long CreateAt { get; set; }
         public string Address { get; set; }
         public List<OrderDetailDTO>  OrderDetails { get; set; }
     }
