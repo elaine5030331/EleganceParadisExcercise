@@ -57,7 +57,7 @@ namespace EleganceParadisAPI
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { 
+                    {
                         new OpenApiSecurityScheme
                         {
                             Reference = new OpenApiReference
@@ -65,9 +65,9 @@ namespace EleganceParadisAPI
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
                             }
-                        }, 
-                        new List<string>() 
-                    } 
+                        },
+                        new List<string>()
+                    }
                 });
             });
 
@@ -76,6 +76,9 @@ namespace EleganceParadisAPI
             builder.Services
                 .Configure<SendEmailSettings>(builder.Configuration.GetSection(SendEmailSettings.SendEmailSettingsKey))
                 .AddSingleton(provider => provider.GetRequiredService<IOptions<SendEmailSettings>>().Value);
+
+            builder.Services.Configure<LinePaySettings>(builder.Configuration.GetRequiredSection(LinePaySettings.LinePaySettingsKey))
+                            .AddSingleton(provider => provider.GetRequiredService<IOptions<LinePaySettings>>().Value);
 
             builder.Services.AddApplicationCoreServices()
                             .AddWebAPIServices()
