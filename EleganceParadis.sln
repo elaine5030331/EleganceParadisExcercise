@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{2C4EAD80-731
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinePayApiSdk", "LinePayApiSdk\LinePayApiSdk.csproj", "{30031C0F-4BDF-472B-91A5-3266D35FEB84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{F0735BFE-A4B2-4AF9-9329-85A6DAC6A88E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0735BFE-A4B2-4AF9-9329-85A6DAC6A88E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0735BFE-A4B2-4AF9-9329-85A6DAC6A88E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30031C0F-4BDF-472B-91A5-3266D35FEB84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30031C0F-4BDF-472B-91A5-3266D35FEB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30031C0F-4BDF-472B-91A5-3266D35FEB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30031C0F-4BDF-472B-91A5-3266D35FEB84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

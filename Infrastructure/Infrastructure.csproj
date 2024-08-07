@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApplicationCore\ApplicationCore.csproj" />
+    <ProjectReference Include="..\LinePayApiSdk\LinePayApiSdk.csproj" />
   </ItemGroup>
 
 </Project>
