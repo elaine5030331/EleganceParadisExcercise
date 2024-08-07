@@ -1,10 +1,10 @@
 ﻿using ApplicationCore.DTOs;
+using ApplicationCore.DTOs.AccountDTOs;
 using ApplicationCore.Entities;
 using ApplicationCore.Enums;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using EleganceParadisAPI.DTOs;
 using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
@@ -17,7 +17,7 @@ using static ApplicationCore.Entities.Account;
 
 namespace EleganceParadisAPI.Services
 {
-    public class AccountService
+    public class AccountService : IAccountService
     {
         private readonly IRepository<Account> _accountRepo;
         private readonly IApplicationPasswordHasher _applicationPasswordHasher;
@@ -48,31 +48,31 @@ namespace EleganceParadisAPI.Services
         }
 
 
-        public async Task<OperationResult<CreateAccountResultDTO>> CreateAccount(RegistDTO registInfo)
+        public async Task<OperationResult<CreateAccountResponse>> CreateAccount(RegistDTO registInfo)
         {
             if (await IsEmailExist(registInfo.Email) || await IsMobileExist(registInfo.Mobile))
             {
-                return new OperationResult<CreateAccountResultDTO>("此帳號已註冊過");
+                return new OperationResult<CreateAccountResponse>("此帳號已註冊過");
             }
             if (string.IsNullOrEmpty(registInfo.Name))
             {
-                return new OperationResult<CreateAccountResultDTO>("請輸入姓名");
+                return new OperationResult<CreateAccountResponse>("請輸入姓名");
             }
             if (!ValidateHelper.TryValidateMobile(registInfo.Mobile, out var mobileErrorMsg))
             {
-                return new OperationResult<CreateAccountResultDTO>(mobileErrorMsg);
+                return new OperationResult<CreateAccountResponse>(mobileErrorMsg);
             }
             if (!ValidateHelper.TryValidateEmail(registInfo.Email, out var emailErrorMsg))
             {
-                return new OperationResult<CreateAccountResultDTO>(emailErrorMsg);
+                return new OperationResult<CreateAccountResponse>(emailErrorMsg);
             }
             if (!Regex.IsMatch(registInfo.Password, passwordPattern))
             {
-                return new OperationResult<CreateAccountResultDTO>("密碼格式有誤");
+                return new OperationResult<CreateAccountResponse>("密碼格式有誤");
             }
             if (registInfo.Password != registInfo.ConfirmedPassword)
             {
-                return new OperationResult<CreateAccountResultDTO>("密碼與確認密碼不符");
+                return new OperationResult<CreateAccountResponse>("密碼與確認密碼不符");
             }
 
             var account = new Account
@@ -86,7 +86,7 @@ namespace EleganceParadisAPI.Services
             };
             _accountRepo.Add(account);
 
-            var result = new CreateAccountResultDTO()
+            var result = new CreateAccountResponse()
             {
                 Email = registInfo.Email,
                 Name = registInfo.Name,
@@ -95,7 +95,7 @@ namespace EleganceParadisAPI.Services
 
             await SendVerifyEmailHandler(account);
 
-            return new OperationResult<CreateAccountResultDTO>(result);
+            return new OperationResult<CreateAccountResponse>(result);
         }
 
         /// <summary>
@@ -201,11 +201,11 @@ namespace EleganceParadisAPI.Services
         }
 
 
-        public async Task<GetAccountInfoDTO> GetAccountInfo(int accountId)
+        public async Task<GetAccountInfoResponse> GetAccountInfo(int accountId)
         {
             var result = await _accountRepo.GetByIdAsync(accountId);
             if (result == null) return default;
-            return new GetAccountInfoDTO()
+            return new GetAccountInfoResponse()
             {
                 AccountId = accountId,
                 Email = result.Email,
@@ -236,7 +236,7 @@ namespace EleganceParadisAPI.Services
             return await IsMobileExist(mobile);
         }
 
-        public async Task<OperationResult<UpdateAcoountInfoResult>> UpdateAccountInfo(UpdateAccountInfo accountInfo)
+        public async Task<OperationResult<UpdateAcoountInfoResult>> UpdateAccountInfo(UpdateAccountInfoRequest accountInfo)
         {
             if (string.IsNullOrEmpty(accountInfo.Name))
             {
@@ -277,7 +277,7 @@ namespace EleganceParadisAPI.Services
             return new OperationResult<UpdateAcoountInfoResult>(updateResult);
         }
 
-        public async Task<OperationResult<UpdateAccountPasswordResult>> UpdateAccountPassword(UpdateAccountPassword accountInfo)
+        public async Task<OperationResult<UpdateAccountPasswordResult>> UpdateAccountPassword(UpdateAccountPasswordRequest accountInfo)
         {
             if (accountInfo.OldPassword == accountInfo.NewPassword)
                 return new OperationResult<UpdateAccountPasswordResult>("新密碼與舊密碼不可相同");
@@ -352,7 +352,7 @@ namespace EleganceParadisAPI.Services
             return new OperationResult();
         }
 
-        public async Task<OperationResult> ResetAccountPasswordAsync(ResetAccountPasswordDTO request)
+        public async Task<OperationResult> ResetAccountPasswordAsync(ResetAccountPasswordRequest request)
         {
             try
             {   

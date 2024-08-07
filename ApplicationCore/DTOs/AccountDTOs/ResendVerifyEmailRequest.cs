@@ -1,4 +1,4 @@
-﻿namespace EleganceParadisAPI.DTOs.AccountDTOs
+﻿namespace ApplicationCore.DTOs.AccountDTOs
 {
     public class ResendVerifyEmailRequest
     {

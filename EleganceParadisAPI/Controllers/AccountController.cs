@@ -1,5 +1,5 @@
-﻿using ApplicationCore.Interfaces;
-using EleganceParadisAPI.DTOs;
+﻿using ApplicationCore.DTOs.AccountDTOs;
+using ApplicationCore.Interfaces;
 using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
@@ -83,7 +83,7 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut("UpdateCustomerInfo/{id}")]
-        public async Task<IActionResult> UpdateAccountInfo(int id, UpdateAccountInfo accountInfo)
+        public async Task<IActionResult> UpdateAccountInfo(int id, UpdateAccountInfoRequest accountInfo)
         {
             if (id != accountInfo.AccountId) return BadRequest();
             var result = await _accountService.UpdateAccountInfo(accountInfo);
@@ -98,7 +98,7 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut("UpdateCustomerPassword/{id}")]
-        public async Task<IActionResult> UpdateAccountPassword(int id, UpdateAccountPassword accountInfo)
+        public async Task<IActionResult> UpdateAccountPassword(int id, UpdateAccountPasswordRequest accountInfo)
         {
             if (id != accountInfo.AccountId) return BadRequest();
             var result = await _accountService.UpdateAccountPassword(accountInfo);
@@ -136,7 +136,7 @@ namespace EleganceParadisAPI.Controllers
         /// <summary>
         /// 發送重設密碼信件
         /// </summary>
-        /// <param name="forgetPasswordDTO"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         /// <response code ="400">
         /// 1. 找不到對應的AccountId
@@ -144,9 +144,9 @@ namespace EleganceParadisAPI.Controllers
         /// </response>
         [HttpPost("ForgetPassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordRequest request)
         {
-            var result = await _accountService.ForgetPasswordAsync(forgetPasswordDTO.Email);
+            var result = await _accountService.ForgetPasswordAsync(request.Email);
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
@@ -164,7 +164,7 @@ namespace EleganceParadisAPI.Controllers
         /// </response>
         [HttpPost("ResetAccountPassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordDTO resetAccountPasswordDTO)
+        public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordRequest resetAccountPasswordDTO)
         {
             //var verifyResult = await _accountService.VerifyForgetPasswordAsync(resetAccountPasswordDTO.EncodingParameter);
             //if (!verifyResult.IsSuccess) 

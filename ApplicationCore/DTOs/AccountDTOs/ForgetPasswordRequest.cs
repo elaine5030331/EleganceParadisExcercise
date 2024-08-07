@@ -1,6 +1,6 @@
 ﻿namespace EleganceParadisAPI.DTOs.AccountDTOs
 {
-    public class ForgetPasswordDTO
+    public class ForgetPasswordRequest
     {
         public string Email { get; set; }
     }
