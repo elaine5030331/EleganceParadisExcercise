@@ -29,7 +29,6 @@ namespace Infrastructure.Data
         public void Dispose()
         {
             _transaction?.Dispose();
-            _context?.Dispose();
         }
 
         public IRepository<TEntity> GetRepository<TEntity>() where TEntity : class
