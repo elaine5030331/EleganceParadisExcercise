@@ -5,17 +5,13 @@ using ApplicationCore.Enums;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
-using EleganceParadisAPI.DTOs.AccountDTOs;
-using EleganceParadisAPI.Helpers;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Globalization;
-using System.Text;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
-using static ApplicationCore.Entities.Account;
 
-namespace EleganceParadisAPI.Services
+namespace ApplicationCore.Services
 {
     public class AccountService : IAccountService
     {
@@ -355,7 +351,7 @@ namespace EleganceParadisAPI.Services
         public async Task<OperationResult> ResetAccountPasswordAsync(ResetAccountPasswordRequest request)
         {
             try
-            {   
+            {
                 var verifyResult = await VerifyForgetPasswordAsync(request.EncodingParameter);
                 if (!verifyResult.IsSuccess)
                     return verifyResult;
@@ -387,7 +383,7 @@ namespace EleganceParadisAPI.Services
         {
             var account = await _accountRepo.FirstOrDefaultAsync(a => a.Email == request.Email);
 
-            if (account == null) 
+            if (account == null)
                 return new OperationResult("找不到此用戶");
 
             if (account.Status != AccountStatus.Unverified)

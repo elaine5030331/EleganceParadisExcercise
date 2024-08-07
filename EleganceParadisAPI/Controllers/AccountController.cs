@@ -1,11 +1,11 @@
 ﻿using ApplicationCore.DTOs.AccountDTOs;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Services;
 using EleganceParadisAPI.DTOs.AccountDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace EleganceParadisAPI.Controllers
 {
@@ -14,11 +14,11 @@ namespace EleganceParadisAPI.Controllers
     [Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly AccountService _accountService;
+        private readonly IAccountService _accountService;
         private readonly IEmailSender _emailSender;
         private readonly JWTService _jwtHelper;
 
-        public AccountController(AccountService accountService, IEmailSender emailSender, JWTService jwtHelper)
+        public AccountController(IAccountService accountService, IEmailSender emailSender, JWTService jwtHelper)
         {
             _accountService = accountService;
             _emailSender = emailSender;

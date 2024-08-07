@@ -9,7 +9,6 @@ namespace EleganceParadisAPI.Configurations
     {
         public static IServiceCollection AddWebAPIServices(this IServiceCollection services)
         {
-            services.AddScoped<AccountService>();
             services.AddTransient<OrderInvalidJob>();
             return services;
         }

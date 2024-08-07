@@ -23,6 +23,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IEmailSender, MailKitService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IAccountService, AccountService>();
             return services;
         }
     }
