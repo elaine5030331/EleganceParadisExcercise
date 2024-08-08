@@ -1,3 +1,4 @@
+using LinePayApiSdk.Converters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -7,7 +8,11 @@ namespace LinePayApiSdk.Extensions
     {
         private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new DecimalWithoutZeroConverter()
+            }
         };
 
         public static string ToJson(this object obj)

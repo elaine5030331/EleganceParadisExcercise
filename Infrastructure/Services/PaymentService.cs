@@ -68,7 +68,7 @@ namespace Infrastructure.Services
                             {
                                 Name = "商品",
                                 Quantity = 1,
-                                Price = decimal.Truncate(total)
+                                Price = total
                             }
                         }
                     }
@@ -105,7 +105,7 @@ namespace Infrastructure.Services
                 var lineApi = new LinePayApi(_linePayApiOptions);
                 var result = await lineApi.ConfirmAsync(transactionId, new ConfirmRequest
                 {
-                    Amount = decimal.Truncate(total),
+                    Amount = total,
                     Currency = "TWD"
                 });
                 //判斷ReturnCode是否為成功，成功改變orderStaus
