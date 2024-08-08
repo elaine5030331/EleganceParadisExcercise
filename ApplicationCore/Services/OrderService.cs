@@ -1,14 +1,11 @@
-﻿using ApplicationCore.DTOs.OrderDTOS;
+﻿using ApplicationCore.DTOs;
+using ApplicationCore.DTOs.OrderDTOS;
 using ApplicationCore.Entities;
 using ApplicationCore.Enums;
+using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
 {
@@ -21,8 +18,9 @@ namespace ApplicationCore.Services
         private readonly IRepository<Product> _productRepository;
         private readonly ILogger<OrderService> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailSender _emailSender;
 
-        public OrderService(ILogger<OrderService> logger, IUnitOfWork unitOfWork)
+        public OrderService(ILogger<OrderService> logger, IUnitOfWork unitOfWork, IEmailSender emailSender)
         {
             _orderRepository = unitOfWork.GetRepository<Order>();
             _orderDetailRepository = unitOfWork.GetRepository<OrderDetail>();
@@ -31,6 +29,7 @@ namespace ApplicationCore.Services
             _productRepository = unitOfWork.GetRepository<Product>();
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _emailSender = emailSender;
         }
 
         public async Task<OperationResult<CreateOrderResponse>> CreateOrderAsync(CreateOrderRequest request)
@@ -119,6 +118,26 @@ namespace ApplicationCore.Services
 
                 await _unitOfWork.CommitAsync();
 
+                //TODO：改為背景執行寄信
+                //寄信
+                var orderResponse = GetOrderResponse(order, orderDetails);
+                await _emailSender.SendAsync(new EmailDTO
+                {
+                    MailTo = orderResponse.Purchaser,
+                    MailToEmail = orderResponse.PurchaserEmail,
+                    Subject = "EleganceParadis 訂單成立",
+                    HTMLContent = EmailTemplateHelper.CreateOrderEmailTemplate(new CreateOrderEmailRequest
+                    {
+                        Purchaser = orderResponse.Purchaser,
+                        OrderNo = orderResponse.OrderNo,
+                        OredreDate = orderResponse.OredreDate,
+                        SumSubTotal = orderResponse.SumSubTotal,
+                        ShippingFee = orderResponse.ShippingFee,
+                        TotalAmount = orderResponse.TotalAmount,
+                        OrderDetails = orderResponse.OrderDetails
+                    })
+                });
+
                 return new OperationResult<CreateOrderResponse>()
                 {
                     IsSuccess = true,
@@ -157,6 +176,9 @@ namespace ApplicationCore.Services
 
         private static OrderResponse GetOrderResponse(Order order, List<OrderDetail> orderDetails)
         {
+            var shippingFee = 130;
+            var sumSubTotal = orderDetails.Sum(od => od.Quantity * od.UnitPrice);
+
             return new OrderResponse()
             {
                 OrderId = order.Id,
@@ -170,6 +192,9 @@ namespace ApplicationCore.Services
                 OredreDate = order.CreateAt.AddHours(8).ToString("yyyy/MM/dd"),
                 CreateAt = order.CreateAt.ToUnixTimeSeconds(),
                 Address = $"{order.City}{order.District}{order.Address}",
+                SumSubTotal = sumSubTotal,
+                ShippingFee = shippingFee,
+                TotalAmount = sumSubTotal + shippingFee,
                 OrderDetails = orderDetails.OrderBy(od => od.Sequence).Select(od => new OrderDetailDTO()
                 {
                     ProductName = od.ProductName,

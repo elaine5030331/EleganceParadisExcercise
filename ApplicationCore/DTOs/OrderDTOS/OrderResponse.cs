@@ -21,6 +21,15 @@ namespace ApplicationCore.DTOs.OrderDTOS
         /// </summary>
         public long CreateAt { get; set; }
         public string Address { get; set; }
+        /// <summary>
+        /// 訂單商品小計：sum(Quantity * UnitPrice)
+        /// </summary>
+        public decimal SumSubTotal { get; set; }
+        public decimal ShippingFee { get; set; }
+        /// <summary>
+        /// 總計：SumSubTotal + ShippingFee 
+        /// </summary>
+        public decimal TotalAmount { get; set; }
         public List<OrderDetailDTO>  OrderDetails { get; set; }
     }
 
