@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,7 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="orderId"></param>
         /// <returns></returns>
         [HttpGet("PayOrder")]
+        [Authorize]
         public async Task<IActionResult> PayOrder(int orderId)
         {
             var result = await _paymentService.PayOrderByLineAsync(orderId);
