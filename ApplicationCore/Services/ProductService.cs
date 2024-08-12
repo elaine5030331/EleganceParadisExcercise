@@ -57,7 +57,6 @@ namespace ApplicationCore.Services
             product.Spu = updateProductDTO.SPU;
             product.ProductName = updateProductDTO.ProductName;
             product.Enable = updateProductDTO.Enable;
-            product.Order = updateProductDTO.Order;
             product.Description = updateProductDTO.Description;
             try
             {
