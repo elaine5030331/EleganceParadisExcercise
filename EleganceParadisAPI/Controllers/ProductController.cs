@@ -29,14 +29,15 @@ namespace EleganceParadisAPI.Controllers
         ///        "categoryId": 類別ID(ex：香水、隨身噴香霧、沐浴與身體保養),
         ///        "spu": "產品編號",
         ///        "productName": "產品名稱",
-        ///        "description": "產品描述"
+        ///        "description": "產品描述",
+        ///        "productImageList": ["string"]
         ///     }
         /// </remarks>
         [HttpPost("AddProduct")]
         public async Task<IActionResult> AddProduct(AddProductDTO addProductDTO)
         {
             var result = await _productService.AddProductAsync(addProductDTO);
-            if (result.IsSuccess) return Created();
+            if (result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
         }
 

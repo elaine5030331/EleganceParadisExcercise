@@ -17,9 +17,15 @@ namespace ApplicationCore.Services
             _logger = logger;
         }
 
-        public async Task<OperationResult> AddProductAsync(AddProductDTO addProductDTO)
+        public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
         {
-            var pruduct = new Product
+            var productImages = addProductDTO.ProductImageList?.Select((url, index) => new ProductImage
+            {
+                Order = index,
+                Url = url
+            }).ToList();
+
+            var product = new Product
             {
                 CategoryId = addProductDTO.CategoryId,
                 Spu = addProductDTO.SPU,
@@ -36,18 +42,26 @@ namespace ApplicationCore.Services
                         SpecName = string.Empty,
                         CreateAt = DateTimeOffset.UtcNow
                     } 
-                }
+                },
+                ProductImages = productImages
             };
 
             try
             {
-                await _productRepo.AddAsync(pruduct);
-                return new OperationResult();
+                await _productRepo.AddAsync(product);
+                return new OperationResult<AddProductResponse>
+                {
+                    IsSuccess = true,
+                    ResultDTO = new AddProductResponse
+                    {
+                        ProductId = product.Id
+                    }
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new OperationResult("新增失敗");
+                return new OperationResult<AddProductResponse>("新增失敗");
             }
         }
 

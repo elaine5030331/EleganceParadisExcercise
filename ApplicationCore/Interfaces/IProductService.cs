@@ -6,7 +6,7 @@ namespace ApplicationCore.Interfaces
 {
     public interface IProductService
     {
-        Task<OperationResult> AddProductAsync(AddProductDTO product);
+        Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO product);
         Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO);
         Task<OperationResult> DeleteProductAsync(int id);
     }
