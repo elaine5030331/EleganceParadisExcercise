@@ -9,12 +9,14 @@ namespace ApplicationCore.Services
     public class ProductService : IProductService
     {
         private readonly IRepository<Product> _productRepo;
+        private readonly IRepository<ProductImage> _productImageRepo;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo)
         {
             _productRepo = productRepo;
             _logger = logger;
+            _productImageRepo = productImageRepo;
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -98,6 +100,29 @@ namespace ApplicationCore.Services
                 _logger.LogError(ex, ex.Message );
                 return new OperationResult("刪除失敗");
             }
+        }
+
+        public async Task<OperationResult> AddProductImagesAsync(int productId, List<string> imageUrlList)
+        {
+            try
+            {
+                var productImages = imageUrlList.Select((url, index) => new ProductImage
+                {
+                    ProductId = productId,
+                    Order = index,
+                    Url = url
+                }).ToList();
+
+                await _productImageRepo.AddRangeAsync(productImages);
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品圖片新增失敗");
+            }
+            
         }
     }
 }

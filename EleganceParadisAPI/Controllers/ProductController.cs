@@ -2,6 +2,8 @@
 using EleganceParadisAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using ApplicationCore.DTOs.ProductDTOs;
+using EleganceParadisAPI.Helpers;
+using EleganceParadisAPI.DTOs;
 
 namespace EleganceParadisAPI.Controllers
 {
@@ -11,11 +13,13 @@ namespace EleganceParadisAPI.Controllers
     {
         private readonly IProductQueryService _productQueryService;
         private readonly IProductService _productService;
+        private readonly IUploadImageService _imageService;
 
-        public ProductController(IProductQueryService productQueryService, IProductService productService)
+        public ProductController(IProductQueryService productQueryService, IProductService productService, IUploadImageService imageService)
         {
             _productQueryService = productQueryService;
             _productService = productService;
+            _imageService = imageService;
         }
 
         /// <summary>
@@ -96,6 +100,32 @@ namespace EleganceParadisAPI.Controllers
         {
             var result = await _productService.DeleteProductAsync(productId);
             if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        /// <summary>
+        /// 新增商品圖片
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <response code ="200">更新成功</response>
+        /// <response code ="400">更新失敗</response>
+        [HttpPost("AddProductImages")]
+        public async Task<IActionResult> AddProductImages([FromForm] AddProductImagesRequest request)
+        {
+            var files = request.Files;
+            if (files == null || files.Count == 0 || files.Any(x => !ImageFileValidator.IsValidateExtensions(x.FileName)))
+            {
+                return BadRequest("檔案上傳格式有誤");
+            }
+            var urlList = new List<string>();    
+            foreach(var file in files)
+            {
+                var uploadResult = await _imageService.UploadImageAsync(file);
+                if(uploadResult.IsSuccess) urlList.Add(uploadResult.ResultDTO.URL);
+            }
+            var result = await _productService.AddProductImagesAsync(request.ProductId, urlList);
+            if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
     }

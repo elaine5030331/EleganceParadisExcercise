@@ -13,8 +13,6 @@ namespace EleganceParadisAPI.Controllers
     public class ImageUploadController : ControllerBase
     {
         private readonly IUploadImageService _imageService;
-        private readonly string[] permittedExtensions = { ".jpg", ".png", ".jpeg", "webp" };
-
         public ImageUploadController(IUploadImageService imageService)
         {
             _imageService = imageService;
