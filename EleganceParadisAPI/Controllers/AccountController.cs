@@ -111,11 +111,6 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="encodingParameter"></param>
         /// <returns></returns>
-        /// <response code ="400">
-        /// 1. 註冊驗證參數異常
-        /// 2. 註冊驗證逾時
-        /// 3. 註冊驗證失敗
-        /// </response>
         /// <remarks>
         /// encodingParameter: API導回前台的Query string
         /// </remarks>
@@ -130,7 +125,7 @@ namespace EleganceParadisAPI.Controllers
                     AccountId = result.ResultDTO.AccountId,
                     Email = result.ResultDTO.Email
                 }));
-            return BadRequest(result.ErrorMessage);
+            return Redirect("https://eleganceparadisapp.azurewebsites.net/404");
         }
 
         /// <summary>
@@ -138,17 +133,13 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        /// <response code ="400">
-        /// 1. 找不到對應的AccountId
-        /// 2. 重設密碼驗證信寄發失敗
-        /// </response>
         [HttpPost("ForgetPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordRequest request)
         {
             var result = await _accountService.ForgetPasswordAsync(request.Email);
             if (result.IsSuccess) return Ok();
-            return BadRequest(result.ErrorMessage);
+            return Redirect("https://eleganceparadisapp.azurewebsites.net/404");
         }
 
         /// <summary>
@@ -156,12 +147,6 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="resetAccountPasswordDTO"></param>
         /// <returns></returns>
-        /// <response code ="400">
-        /// 1. 密碼格式有誤
-        /// 2. 找不到對應的AccountId
-        /// 3. 與舊密碼相同
-        /// 4. 重設密碼失敗
-        /// </response>
         [HttpPost("ResetAccountPassword")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetAccountPassword(ResetAccountPasswordRequest resetAccountPasswordDTO)
@@ -173,7 +158,7 @@ namespace EleganceParadisAPI.Controllers
             var result = await _accountService.ResetAccountPasswordAsync(resetAccountPasswordDTO);
             
             if (result.IsSuccess) return Ok();
-            return BadRequest(result.ErrorMessage);
+            return Redirect("https://eleganceparadisapp.azurewebsites.net/404");
         }
 
         /// <summary>
@@ -182,17 +167,13 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         /// <response code ="200">信件已寄出</response>
-        /// <response code ="400">
-        /// 1. 找不到此用戶
-        /// 2. 此帳戶已驗證過
-        /// </response>
         [HttpPost("ResendVerifyEmail")]
         [AllowAnonymous]
         public async Task<IActionResult> ResendVerifyEmail(ResendVerifyEmailRequest request)
         {
             var result = await _accountService.ResendVerifyEmailAsync(request);
             if (result.IsSuccess) return Ok();
-            return BadRequest(result.ErrorMessage);
+            return Redirect("https://eleganceparadisapp.azurewebsites.net/404");
         }
     }
 }
