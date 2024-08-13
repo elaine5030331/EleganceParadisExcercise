@@ -40,7 +40,7 @@ namespace EleganceParadisAPI.Controllers
         public async Task<IActionResult> ComfirmPayment([FromQuery] string transactionId, [FromQuery] string orderId)
         {
             var result = await _paymentService.ComfirmPaymentAsync(transactionId, orderId);
-            if (result.IsSuccess) return Redirect("https://eleganceparadis.azurewebsites.net/");
+            if (result.IsSuccess) return Redirect("https://eleganceparadisapp.azurewebsites.net/");
             return BadRequest(result.ErrorMessage);
         }
 
@@ -51,7 +51,7 @@ namespace EleganceParadisAPI.Controllers
         [HttpGet("CancelPayment")]
         public IActionResult CancelPayment()
         {
-            return Redirect("https://eleganceparadis.azurewebsites.net/");
+            return Redirect("https://eleganceparadisapp.azurewebsites.net/");
         }
     }
 }
