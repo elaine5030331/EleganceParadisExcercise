@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApplicationCore.DTOs.ProductDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EleganceParadisAPI.Controllers
 {
@@ -51,6 +52,7 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="categoryId"></param>
         /// <returns></returns>
         [HttpGet("GetProductsByCategory/{categoryId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductsByCategory(int categoryId)
         {
             var result = await _productQueryService.GetProducts(categoryId);
@@ -64,6 +66,7 @@ namespace EleganceParadisAPI.Controllers
         /// <returns></returns>
         /// <response code ="404">找不到此產品</response>
         [HttpGet("GetProductById/{productId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductById(int productId)
         {
             var result = await _productQueryService.GetProductById(productId);
@@ -118,14 +121,41 @@ namespace EleganceParadisAPI.Controllers
             {
                 return BadRequest("檔案上傳格式有誤");
             }
-            var urlList = new List<string>();    
-            foreach(var file in files)
+            var urlList = new List<string>();
+            foreach (var file in files)
             {
                 var uploadResult = await _imageService.UploadImageAsync(file);
-                if(uploadResult.IsSuccess) urlList.Add(uploadResult.ResultDTO.URL);
+                if (uploadResult.IsSuccess) urlList.Add(uploadResult.ResultDTO.URL);
             }
             var result = await _productService.AddProductImagesAsync(request.ProductId, urlList);
             if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        /// <summary>
+        /// 更新商品圖片
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>
+        ///Sample request:<br/>
+        ///     {
+        ///         "productId": 5,
+        ///         "imageUrlList": 陣列裡放圖片URL，URL存放順序為商品圖顯示順序
+        ///         [
+        ///           "https://th.bing.com/th/id/R.4fd7f045a5b9245044d0e852e7952d05?rik=zXFnCnYCLsvf1Q&pid=ImgRaw&r=0",
+        ///           "https://th.bing.com/th/id/OIP.ruPnrBQCKcBxafwMiXdVjAHaHa?rs=1&pid=ImgDetMain",
+        ///           "https://img.zcool.cn/community/0175f65cfa44dea801213ec215114a.jpg@2o.jpg"
+        ///         ]
+        ///     }
+        /// </remarks>
+        [HttpPut("UpdateProductImages")]
+        public async Task<IActionResult> UpdateProductImages(UpdateProductImagesRequest request)
+        {
+            if (request.ImageUrlList.Count < 1) return BadRequest("請選擇上傳檔案");
+
+            var result = await _productService.UpdateProductImagesAsync(request.ProductId, request.ImageUrlList);
+            if (result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
         }
     }

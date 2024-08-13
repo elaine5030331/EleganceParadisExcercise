@@ -11,12 +11,14 @@ namespace ApplicationCore.Services
         private readonly IRepository<Product> _productRepo;
         private readonly IRepository<ProductImage> _productImageRepo;
         private readonly ILogger<ProductService> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork)
         {
             _productRepo = productRepo;
             _logger = logger;
-            _productImageRepo = productImageRepo;
+            _unitOfWork = unitOfWork;
+            _productImageRepo = unitOfWork.GetRepository<ProductImage>();
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -36,14 +38,14 @@ namespace ApplicationCore.Services
                 IsDelete = false,
                 Description = addProductDTO.Description,
                 CreateAt = DateTimeOffset.UtcNow,
-                Specs = new List<Spec> 
+                Specs = new List<Spec>
                 {
                     new Spec
                     {
                         Sku = string.Empty,
                         SpecName = string.Empty,
                         CreateAt = DateTimeOffset.UtcNow
-                    } 
+                    }
                 },
                 ProductImages = productImages
             };
@@ -79,9 +81,9 @@ namespace ApplicationCore.Services
                 await _productRepo.UpdateAsync(product);
                 return new OperationResult();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                _logger.LogError(ex,ex.Message);
+                _logger.LogError(ex, ex.Message);
                 return new OperationResult("更新失敗");
             }
         }
@@ -95,9 +97,9 @@ namespace ApplicationCore.Services
                 await _productRepo.UpdateAsync(product);
                 return new OperationResult();
             }
-            catch (Exception ex) 
-            { 
-                _logger.LogError(ex, ex.Message );
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
                 return new OperationResult("刪除失敗");
             }
         }
@@ -122,7 +124,46 @@ namespace ApplicationCore.Services
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult("商品圖片新增失敗");
             }
-            
+
+        }
+
+        public async Task<OperationResult<UpdateProductImagesResponse>> UpdateProductImagesAsync(int productId, List<string> imageUrlList)
+        {
+            try
+            {
+                var productImageList = await _productImageRepo.ListAsync(pi => pi.ProductId == productId);
+                if (productImageList.Count < 1) return new OperationResult<UpdateProductImagesResponse>("找不到對應的商品圖");
+
+                await _unitOfWork.BeginAsync();
+                await _productImageRepo.DeleteRangeAsync(productImageList);
+
+                var result = await AddProductImagesAsync(productId, imageUrlList);
+                await _unitOfWork.CommitAsync();
+                if (result.IsSuccess)
+                {
+                    return new OperationResult<UpdateProductImagesResponse>
+                    {
+                        IsSuccess = true,
+                        ResultDTO = new UpdateProductImagesResponse
+                        {
+                            ProductId = productId,
+                            ImageUrlList = imageUrlList
+                        }
+                    };
+                }
+
+                return new OperationResult<UpdateProductImagesResponse>("商品圖片更新失敗");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                await _unitOfWork.RollbackAsync();
+                return new OperationResult<UpdateProductImagesResponse>("商品圖片更新失敗");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
         }
     }
 }
