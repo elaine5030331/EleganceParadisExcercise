@@ -66,12 +66,11 @@ namespace EleganceParadisAPI.Controllers
         {
             var accountName = _configuration.GetValue<string>("AdminInfoSettings:AccountName");
             var password = _configuration.GetValue<string>("AdminInfoSettings:Password");
-            var roleName = _configuration.GetValue<string>("AdminInfoSettings:Role");
 
             if (accountName != request.AccountName || password != request.Password)
                 return BadRequest("帳號或密碼有誤，請重新輸入");
 
-            return Ok(_jwtService.GenerateAdminToken(accountName, roleName));
+            return Ok(_jwtService.GenerateAdminToken(accountName));
         }
 
         /// <summary>

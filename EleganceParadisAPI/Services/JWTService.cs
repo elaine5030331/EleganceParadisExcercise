@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.Constants;
+using ApplicationCore.Entities;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using EleganceParadisAPI.DTOs.AuthDTOs;
@@ -77,12 +78,12 @@ namespace EleganceParadisAPI.Services
             };
         }
 
-        public GenerateAdminTokenResponse GenerateAdminToken(string accountName, string roleName)
+        public GenerateAdminTokenResponse GenerateAdminToken(string accountName)
         {
             var claims = new List<Claim>();
             claims.Add(new Claim(JwtRegisteredClaimNames.Name, accountName));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            claims.Add(new Claim(ClaimTypes.Role, roleName));
+            claims.Add(new Claim(ClaimTypes.Role, EleganceParadisRole.Admin));
 
             var serializeToken = GenerateJWT(claims);
 
