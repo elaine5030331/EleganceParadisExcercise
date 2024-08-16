@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Models
+namespace ApplicationCore.Settings
 {
     public class MailServerOptions
     {

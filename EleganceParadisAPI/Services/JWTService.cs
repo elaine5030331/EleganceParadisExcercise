@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.Constants;
+using ApplicationCore.Entities;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using EleganceParadisAPI.DTOs.AuthDTOs;
@@ -33,9 +34,6 @@ namespace EleganceParadisAPI.Services
                     AccountStatus = account.Status,
                 };
 
-            var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
-            var signKey = _configuration.GetValue<string>("JwtSettings:SignKey");
-
             //將所需資訊(使用者相關的資料)加入Claim(聲明)中
             var claims = new List<Claim>();
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, generateTokenDTO.Email));
@@ -52,25 +50,7 @@ namespace EleganceParadisAPI.Services
             //    }
             //}
 
-            //宣告身分識別參數
-            var userClaimsIdentity = new ClaimsIdentity(claims);
-            //建立對稱式加密金鑰(for JWT 簽章)
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signKey));
-            //產生數位簽章的密碼編譯演算法
-            var signingCretentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var tokenDescriptor = new SecurityTokenDescriptor()
-            {
-                Issuer = issuer,
-                Subject = userClaimsIdentity,
-                Expires = DateTime.UtcNow.AddMinutes(generateTokenDTO.AccessTokenExpireMinutes),
-                SigningCredentials = signingCretentials
-            };
-
-            //產生JWT
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-            var serializeToken = tokenHandler.WriteToken(securityToken);
+            var serializeToken = GenerateJWT(claims);
 
             //RefreshToken
             var refreshToken = Guid.NewGuid().ToString("N");
@@ -96,7 +76,50 @@ namespace EleganceParadisAPI.Services
                 ExpireTime = expireTime.ToUnixTimeSeconds(),
                 AccountStatus = account.Status
             };
+        }
 
+        public GenerateAdminTokenResponse GenerateAdminToken(string accountName)
+        {
+            var claims = new List<Claim>();
+            claims.Add(new Claim(JwtRegisteredClaimNames.Name, accountName));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claims.Add(new Claim(ClaimTypes.Role, EleganceParadisRole.Admin));
+
+            var serializeToken = GenerateJWT(claims);
+
+            return new GenerateAdminTokenResponse()
+            {
+                AccessToken = serializeToken,
+                ExpireTime = DateTimeOffset.UtcNow.AddMinutes(60 * 24 * 7).ToUnixTimeSeconds(),
+            };
+        }
+
+        private string GenerateJWT(List<Claim> claims)
+        {
+            var issuer = _configuration.GetValue<string>("JwtSettings:Issuer");
+            var signKey = _configuration.GetValue<string>("JwtSettings:SignKey");
+
+            //宣告身分識別參數
+            var userClaimsIdentity = new ClaimsIdentity(claims);
+            //建立對稱式加密金鑰(for JWT 簽章)
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signKey));
+            //產生數位簽章的密碼編譯演算法
+            var signingCretentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor()
+            {
+                Issuer = issuer,
+                Subject = userClaimsIdentity,
+                Expires = DateTime.UtcNow.AddMinutes(60*7),
+                SigningCredentials = signingCretentials
+            };
+
+            //產生JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var serializeToken = tokenHandler.WriteToken(securityToken);
+
+            return serializeToken;
         }
 
         public async Task LogoutAsync(LogoutRequest request)

@@ -3,6 +3,7 @@ using ApplicationCore.Entities;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
+using ApplicationCore.Settings;
 using LinePayApiSdk;
 using LinePayApiSdk.DTOs;
 using LinePayApiSdk.DTOs.Confirm;
