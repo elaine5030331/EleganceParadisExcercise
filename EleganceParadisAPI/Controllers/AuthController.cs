@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Interfaces;
+using ApplicationCore.Settings;
 using EleganceParadisAPI.DTOs.AuthDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.Services;
@@ -15,14 +16,14 @@ namespace EleganceParadisAPI.Controllers
         private readonly JWTService _jwtService;
         private readonly IUserManageService _userManageService;
         private readonly ILogger<AuthController> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly AdminInfoSettings _adminInfoSettings;
 
-        public AuthController(JWTService jwtService, IUserManageService userManageService, ILogger<AuthController> logger, IConfiguration configuration)
+        public AuthController(JWTService jwtService, IUserManageService userManageService, ILogger<AuthController> logger, AdminInfoSettings adminInfoSettings)
         {
             _jwtService = jwtService;
             _userManageService = userManageService;
             _logger = logger;
-            _configuration = configuration;
+            _adminInfoSettings = adminInfoSettings;
         }
 
         /// <summary>
@@ -64,8 +65,8 @@ namespace EleganceParadisAPI.Controllers
         [HttpPost("AdminLogin")]
         public IActionResult AdminLogin(AdminLoginRequest request)
         {
-            var accountName = _configuration.GetValue<string>("AdminInfoSettings:AccountName");
-            var password = _configuration.GetValue<string>("AdminInfoSettings:Password");
+            var accountName = _adminInfoSettings.AccountName;
+            var password = _adminInfoSettings.Password;
 
             if (accountName != request.AccountName || password != request.Password)
                 return BadRequest("帳號或密碼有誤，請重新輸入");

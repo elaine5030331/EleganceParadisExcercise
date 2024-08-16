@@ -70,18 +70,10 @@ namespace EleganceParadisAPI
                 });
             });
 
-            builder.Services.Configure<MailServerOptions>(builder.Configuration.GetSection(MailServerOptions.MailServerSettings));
-
-            builder.Services
-                .Configure<SendEmailSettings>(builder.Configuration.GetSection(SendEmailSettings.SendEmailSettingsKey))
-                .AddSingleton(provider => provider.GetRequiredService<IOptions<SendEmailSettings>>().Value);
-
-            builder.Services.Configure<LinePaySettings>(builder.Configuration.GetRequiredSection(LinePaySettings.LinePaySettingsKey))
-                            .AddSingleton(provider => provider.GetRequiredService<IOptions<LinePaySettings>>().Value);
-
             builder.Services.AddApplicationCoreServices()
                             .AddWebAPIServices()
-                            .AddAuthServices(builder.Configuration);
+                            .AddAuthServices(builder.Configuration)
+                            .AddAppSettings(builder.Configuration);
 
             builder.Services.AddScheduler();
 
