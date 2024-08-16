@@ -1,5 +1,4 @@
-
-using ApplicationCore.Models;
+using ApplicationCore.Settings;
 using Coravel;
 using EleganceParadisAPI.Configurations;
 using Infrastructure.Data;

@@ -1,6 +1,6 @@
 ﻿using ApplicationCore.DTOs;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Models;
+using ApplicationCore.Settings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
