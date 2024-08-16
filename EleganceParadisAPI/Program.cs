@@ -24,16 +24,17 @@ namespace EleganceParadisAPI
 
             builder.Services.AddControllers();
 
+            var origins = builder.Configuration.GetSection("CorsPolicySettings:Origins").Get<string[]>();
+
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("https://eleganceparadis.azurewebsites.net",
-                                           "http://localhost:5173")
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod()
-                                            .AllowCredentials();
+                        policy.WithOrigins(origins)
+                              .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
                     });
             });
 
