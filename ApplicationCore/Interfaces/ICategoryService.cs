@@ -7,5 +7,6 @@ namespace ApplicationCore.Interfaces
     {
         Task<List<GetCategoriesResponse>> GetCategories();
         Task<OperationResult> AddCategoryAsync(AddCategoryRequest request);
+        Task<OperationResult> DeleteCategoryAsync(int categoryId);
     }
 }

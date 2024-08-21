@@ -70,5 +70,28 @@ namespace ApplicationCore.Services
                 }).ToList()
             }).ToList();
         }
+
+        public async Task<OperationResult> DeleteCategoryAsync(int categoryId)
+        {
+            try
+            {
+                var category = await _categoryRepo.GetByIdAsync(categoryId);
+                if (category == null)
+                    return new OperationResult("找不到對應的商品類別ID");
+
+                category.IsDelete = true;
+                await _categoryRepo.UpdateAsync(category);
+
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品類別刪除失敗");
+            }
+        }
     }
 }

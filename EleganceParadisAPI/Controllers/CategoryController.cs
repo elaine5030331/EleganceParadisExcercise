@@ -36,10 +36,23 @@ namespace EleganceParadisAPI.Controllers
         ///      "parentCategoryId": 父類別ID
         ///     }
         /// </remarks>
-    [HttpPost("AddCategory")]
+        [HttpPost("AddCategory")]
         public async Task<IActionResult> AddCategory(AddCategoryRequest request)
         {
             var result = await _categoryService.AddCategoryAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        /// <summary>
+        /// 刪除商品類別
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteCategory/{categoryId}")]
+        public async Task<IActionResult> DeleteCategory(int categoryId)
+        {
+            var result = await _categoryService.DeleteCategoryAsync(categoryId);
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
