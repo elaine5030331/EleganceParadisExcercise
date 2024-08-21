@@ -1,30 +1,66 @@
-﻿using ApplicationCore.DTOs;
+﻿using ApplicationCore.DTOs.CategoryDTOs;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ApplicationCore.Services
 {
     public class CategoryService : ICategoryService
     {
         private IRepository<Category> _categoryRepo;
+        private ILogger<CategoryService> _logger;
 
-        public CategoryService(IRepository<Category> categoryRepo)
+        public CategoryService(IRepository<Category> categoryRepo, ILogger<CategoryService> logger)
         {
             _categoryRepo = categoryRepo;
+            _logger = logger;
         }
 
-        public async Task<List<CategoryDTO>> GetCategories()
+        public async Task<OperationResult> AddCategoryAsync(AddCategoryRequest request)
+        {
+            try
+            {
+                var isCategoryExist = await _categoryRepo.AnyAsync(c => c.Name == request.Name);
+                if (isCategoryExist)
+                    return new OperationResult("該商品類別名稱已存在");
+
+                var category = new Category
+                {
+                    Name = request.Name,
+                    ImageUrl = request.ImageURL,
+                    Description = request.Description,
+                    Order = 0,
+                    IsDelete = false,
+                    ParentCategoryId = request.ParentCategoryId
+                };
+
+                await _categoryRepo.AddAsync(category);
+
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品類別新增失敗");
+            }
+        }
+
+        public async Task<List<GetCategoriesResponse>> GetCategories()
         {
             var parentCategory = (await _categoryRepo.ListAsync(x => x.ParentCategoryId == null)).OrderBy(x => x.Order);
-            var chidrenCategory = await _categoryRepo.ListAsync(c => parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
-            return parentCategory.Select(pc => new CategoryDTO
+            var childrenCategory = await _categoryRepo.ListAsync(c => parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
+            return parentCategory.Where(pc => !pc.IsDelete).Select(pc => new GetCategoriesResponse
             {
                 Id = pc.Id,
                 Description = pc.Description,
                 ImageURL = pc.ImageUrl,
                 Name = pc.Name,
                 Order = pc.Order,
-                SubCategory = chidrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id).Select(c => new CategoryDTO
+                SubCategory = childrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id && !x.IsDelete).Select(c => new GetCategoriesResponse
                 {
                     Id = c.Id,
                     Description = c.Description,
@@ -33,6 +69,58 @@ namespace ApplicationCore.Services
                     Order = c.Order
                 }).ToList()
             }).ToList();
+        }
+
+        public async Task<OperationResult> UpdateCategoryInfoAsync(UpdateCategoryInfoRequest request)
+        {
+            try
+            {
+                var category = await _categoryRepo.GetByIdAsync(request.CategoryId);
+                if (category == null)
+                    return new OperationResult("找不到對應的商品類別ID");
+                if (category.Name == request.Name)
+                    return new OperationResult("該商品類別名稱已存在");
+
+                category.Name = request.Name;
+                category.Description = request.Description;
+                category.ImageUrl = request.ImageURL;
+                category.ParentCategoryId = request.ParentCategoryId;
+
+                await _categoryRepo.UpdateAsync(category);
+
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品類別更新失敗");
+            }
+        }
+
+        public async Task<OperationResult> DeleteCategoryAsync(int categoryId)
+        {
+            try
+            {
+                var category = await _categoryRepo.GetByIdAsync(categoryId);
+                if (category == null)
+                    return new OperationResult("找不到對應的商品類別ID");
+
+                category.IsDelete = true;
+                await _categoryRepo.UpdateAsync(category);
+
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品類別刪除失敗");
+            }
         }
     }
 }
