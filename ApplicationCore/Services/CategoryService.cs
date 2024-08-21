@@ -16,15 +16,15 @@ namespace ApplicationCore.Services
         public async Task<List<CategoryDTO>> GetCategories()
         {
             var parentCategory = (await _categoryRepo.ListAsync(x => x.ParentCategoryId == null)).OrderBy(x => x.Order);
-            var chidrenCategory = await _categoryRepo.ListAsync(c => parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
-            return parentCategory.Select(pc => new CategoryDTO
+            var childrenCategory = await _categoryRepo.ListAsync(c => parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
+            return parentCategory.Where(pc => !pc.IsDelete).Select(pc => new CategoryDTO
             {
                 Id = pc.Id,
                 Description = pc.Description,
                 ImageURL = pc.ImageUrl,
                 Name = pc.Name,
                 Order = pc.Order,
-                SubCategory = chidrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id).Select(c => new CategoryDTO
+                SubCategory = childrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id && !x.IsDelete).Select(c => new CategoryDTO
                 {
                     Id = c.Id,
                     Description = c.Description,
