@@ -51,16 +51,16 @@ namespace ApplicationCore.Services
 
         public async Task<List<GetCategoriesResponse>> GetCategories()
         {
-            var parentCategory = (await _categoryRepo.ListAsync(x => x.ParentCategoryId == null)).OrderBy(x => x.Order);
-            var childrenCategory = await _categoryRepo.ListAsync(c => parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
-            return parentCategory.Where(pc => !pc.IsDelete).Select(pc => new GetCategoriesResponse
+            var parentCategory = (await _categoryRepo.ListAsync(x => x.ParentCategoryId == null && !x.IsDelete)).OrderBy(x => x.Order);
+            var childrenCategory = await _categoryRepo.ListAsync(c => !c.IsDelete && parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
+            return parentCategory.Select(pc => new GetCategoriesResponse
             {
                 Id = pc.Id,
                 Description = pc.Description,
                 ImageURL = pc.ImageUrl,
                 Name = pc.Name,
                 Order = pc.Order,
-                SubCategory = childrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id && !x.IsDelete).Select(c => new GetCategoriesResponse
+                SubCategory = childrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id).Select(c => new GetCategoriesResponse
                 {
                     Id = c.Id,
                     Description = c.Description,
