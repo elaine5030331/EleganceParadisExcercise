@@ -1,11 +1,14 @@
-﻿using ApplicationCore.DTOs.CategoryDTOs;
+﻿using ApplicationCore.Constants;
+using ApplicationCore.DTOs.CategoryDTOs;
 using ApplicationCore.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = EleganceParadisRole.Admin)]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -16,6 +19,7 @@ namespace EleganceParadisAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllCategory()
         {
             var result = await _categoryService.GetCategories();
