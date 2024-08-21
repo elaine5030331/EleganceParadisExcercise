@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Interfaces;
+﻿using ApplicationCore.DTOs.CategoryDTOs;
+using ApplicationCore.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.Controllers
@@ -19,6 +20,28 @@ namespace EleganceParadisAPI.Controllers
         {
             var result = await _categoryService.GetCategories();
             return Ok(result);
+        }
+
+        /// <summary>
+        /// 新增商品類別
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///      "name": "類別名稱",
+        ///      "imageURL": "類別圖片URL",
+        ///      "description": "類別描述",
+        ///      "parentCategoryId": 父類別ID
+        ///     }
+        /// </remarks>
+    [HttpPost("AddCategory")]
+        public async Task<IActionResult> AddCategory(AddCategoryRequest request)
+        {
+            var result = await _categoryService.AddCategoryAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿using ApplicationCore.DTOs;
+﻿using ApplicationCore.DTOs.CategoryDTOs;
+using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryDTO>> GetCategories();
+        Task<List<GetCategoriesResponse>> GetCategories();
+        Task<OperationResult> AddCategoryAsync(AddCategoryRequest request);
     }
 }
