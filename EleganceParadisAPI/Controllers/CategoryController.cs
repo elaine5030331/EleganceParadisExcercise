@@ -56,5 +56,22 @@ namespace EleganceParadisAPI.Controllers
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 更新商品類別
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateCategoryInfo/{categoryId}")]
+        public async Task<IActionResult> UpdateCategoryInfo(int categoryId, UpdateCategoryInfoRequest request)
+        {
+            if (categoryId != request.CategoryId)
+                return BadRequest("參數有問題");
+
+            var result = await _categoryService.UpdateCategoryInfoAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }

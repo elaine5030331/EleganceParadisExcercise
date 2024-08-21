@@ -71,6 +71,35 @@ namespace ApplicationCore.Services
             }).ToList();
         }
 
+        public async Task<OperationResult> UpdateCategoryInfoAsync(UpdateCategoryInfoRequest request)
+        {
+            try
+            {
+                var category = await _categoryRepo.GetByIdAsync(request.CategoryId);
+                if (category == null)
+                    return new OperationResult("找不到對應的商品類別ID");
+                if (category.Name == request.Name)
+                    return new OperationResult("該商品類別名稱已存在");
+
+                category.Name = request.Name;
+                category.Description = request.Description;
+                category.ImageUrl = request.ImageURL;
+                category.ParentCategoryId = request.ParentCategoryId;
+
+                await _categoryRepo.UpdateAsync(category);
+
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("商品類別更新失敗");
+            }
+        }
+
         public async Task<OperationResult> DeleteCategoryAsync(int categoryId)
         {
             try
