@@ -1,7 +1,9 @@
-﻿using ApplicationCore.DTOs;
+﻿using ApplicationCore.Constants;
+using ApplicationCore.DTOs;
 using ApplicationCore.DTOs.ProductDTOs;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +11,7 @@ namespace EleganceParadisAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = EleganceParadisRole.Admin)]
     public class SpecController : ControllerBase
     {
         private readonly ISpecService _specService;
