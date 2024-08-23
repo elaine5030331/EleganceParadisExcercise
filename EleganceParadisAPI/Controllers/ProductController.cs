@@ -5,11 +5,13 @@ using ApplicationCore.DTOs.ProductDTOs;
 using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using ApplicationCore.Constants;
 
 namespace EleganceParadisAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = EleganceParadisRole.Admin)]
     public class ProductController : ControllerBase
     {
         private readonly IProductQueryService _productQueryService;
