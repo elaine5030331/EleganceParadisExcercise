@@ -382,19 +382,27 @@ namespace ApplicationCore.Services
 
         public async Task<OperationResult> ResendVerifyEmailAsync(ResendVerifyEmailRequest request)
         {
-            var account = await _accountRepo.FirstOrDefaultAsync(a => a.Email == request.Email);
-
-            if (account == null)
-                return new OperationResult("找不到此用戶");
-
-            if (account.Status != AccountStatus.Unverified)
+            try
             {
-                return new OperationResult("此帳戶已驗證過");
+                var account = await _accountRepo.FirstOrDefaultAsync(a => a.Email == request.Email);
+
+                if (account == null)
+                    return new OperationResult("找不到此用戶");
+
+                if (account.Status != AccountStatus.Unverified)
+                {
+                    return new OperationResult("此帳戶已驗證過");
+                }
+                else
+                {
+                    await SendVerifyEmailHandler(account);
+                    return new OperationResult();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await SendVerifyEmailHandler(account);
-                return new OperationResult();
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("重發註冊驗證信失敗");
             }
         }
     }
