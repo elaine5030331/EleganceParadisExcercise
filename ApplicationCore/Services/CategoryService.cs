@@ -75,6 +75,9 @@ namespace ApplicationCore.Services
                 if (category == null)
                     return new OperationResult("找不到對應的商品類別ID");
 
+                if (request.CategoryId == request.ParentCategoryId)
+                    return new OperationResult("不可將自己設為父類別");
+
                 category.Name = request.Name;
                 category.Description = request.Description;
                 category.ImageUrl = request.ImageURL;
