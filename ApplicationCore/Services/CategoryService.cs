@@ -21,10 +21,6 @@ namespace ApplicationCore.Services
         {
             try
             {
-                var isCategoryExist = await _categoryRepo.AnyAsync(c => c.Name == request.Name);
-                if (isCategoryExist)
-                    return new OperationResult("該商品類別名稱已存在");
-
                 var category = new Category
                 {
                     Name = request.Name,
@@ -78,8 +74,6 @@ namespace ApplicationCore.Services
                 var category = await _categoryRepo.GetByIdAsync(request.CategoryId);
                 if (category == null)
                     return new OperationResult("找不到對應的商品類別ID");
-                if (category.Name == request.Name)
-                    return new OperationResult("該商品類別名稱已存在");
 
                 category.Name = request.Name;
                 category.Description = request.Description;
