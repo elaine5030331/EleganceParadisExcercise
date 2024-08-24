@@ -1,4 +1,5 @@
-﻿using ApplicationCore.DTOs.ProductDTOs;
+﻿using ApplicationCore.DTOs.CategoryDTOs;
+using ApplicationCore.DTOs.ProductDTOs;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
@@ -10,15 +11,17 @@ namespace ApplicationCore.Services
     {
         private readonly IRepository<Product> _productRepo;
         private readonly IRepository<ProductImage> _productImageRepo;
+        private readonly IRepository<Spec> _specRepo;
         private readonly ILogger<ProductService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specrepository)
         {
             _productRepo = productRepo;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _productImageRepo = unitOfWork.GetRepository<ProductImage>();
+            _specRepo = specrepository;
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -163,6 +166,65 @@ namespace ApplicationCore.Services
             finally
             {
                 _unitOfWork.Dispose();
+            }
+        }
+
+        public async Task<OperationResult<GetAllProductsResponse>> GetAllProductsAsync(GetAllProductsRequest request)
+        {
+            try
+            {
+                List<Product> products = new List<Product>();
+
+                if(request.CategoryId != null)
+                {
+                    products = await _productRepo.ListAsync(p => p.CategoryId == request.CategoryId && !p.IsDelete);
+                }
+                else
+                {
+                    products = await _productRepo.ListAsync(p => !p.IsDelete);
+                }
+
+                if (products.Count < 1)
+                    return new OperationResult<GetAllProductsResponse>("目前尚未有商品");
+
+                var specs = await _specRepo.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId));
+                var productImages = await _productImageRepo.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId));
+
+                return new OperationResult<GetAllProductsResponse>()
+                {
+                    IsSuccess = true,
+                    ResultDTO = new GetAllProductsResponse()
+                    {
+                        ProductList = products.Select(p => new ProductItem
+                        {
+                            CategoryId = p.CategoryId,
+                            ProductId = p.Id,
+                            ProductName = p.ProductName,
+                            SPU = p.Spu,
+                            Description = p.Description,
+                            Enable = p.Enable,
+                            CreateAt = p.CreateAt.ToLocalTime().ToString("yyyy/MM/dd"),
+                            SpecList = specs.Select(s => new SpecItems
+                            {
+                                SpecId = s.Id,
+                                SKU = s.Sku,
+                                SpecName = s.SpecName,
+                                UnitPrice = s.UnitPrice,
+                                StockQuantity = s.StockQuantity,
+                            }).ToList(),
+                            ImageList = productImages.Select(i => new Images
+                            {
+                                ProductImageId = i.Id,
+                                URL = i.Url
+                            }).ToList()
+                        }).ToList()
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult<GetAllProductsResponse>("取得商品清單失敗");
             }
         }
     }
