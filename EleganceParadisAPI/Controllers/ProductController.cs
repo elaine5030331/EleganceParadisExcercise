@@ -6,6 +6,7 @@ using EleganceParadisAPI.Helpers;
 using EleganceParadisAPI.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using ApplicationCore.Constants;
+using ApplicationCore.DTOs.CategoryDTOs;
 
 namespace EleganceParadisAPI.Controllers
 {
@@ -157,6 +158,15 @@ namespace EleganceParadisAPI.Controllers
             if (request.ImageUrlList.Count < 1) return BadRequest("請選擇上傳檔案");
 
             var result = await _productService.UpdateProductImagesAsync(request.ProductId, request.ImageUrlList);
+            if (result.IsSuccess) return Ok(result.ResultDTO);
+            return BadRequest(result.ErrorMessage);
+        }
+
+
+        [HttpPost("GetAllProducts")]
+        public async Task<IActionResult> GetAllProducts(GetAllProductsRequest request)
+        {
+            var result = await _productService.GetAllProductsAsync(request);
             if (result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
         }
