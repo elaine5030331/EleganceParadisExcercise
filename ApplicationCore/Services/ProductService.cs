@@ -15,13 +15,13 @@ namespace ApplicationCore.Services
         private readonly ILogger<ProductService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specrepository)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specRepo)
         {
             _productRepo = productRepo;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _productImageRepo = unitOfWork.GetRepository<ProductImage>();
-            _specRepo = specrepository;
+            _specRepo = specRepo;
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -75,6 +75,7 @@ namespace ApplicationCore.Services
         public async Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
         {
             var product = _productRepo.GetById(productId);
+            product.CategoryId = updateProductDTO.CategoryId;
             product.Spu = updateProductDTO.SPU;
             product.ProductName = updateProductDTO.ProductName;
             product.Enable = updateProductDTO.Enable;
@@ -204,7 +205,7 @@ namespace ApplicationCore.Services
                             Description = p.Description,
                             Enable = p.Enable,
                             CreateAt = p.CreateAt.ToLocalTime().ToString("yyyy/MM/dd"),
-                            SpecList = specs.Select(s => new SpecItems
+                            SpecList = specs.Where(s => s.ProductId == p.Id).Select(s => new SpecItems
                             {
                                 SpecId = s.Id,
                                 SKU = s.Sku,
@@ -212,7 +213,7 @@ namespace ApplicationCore.Services
                                 UnitPrice = s.UnitPrice,
                                 StockQuantity = s.StockQuantity,
                             }).ToList(),
-                            ImageList = productImages.Select(i => new Images
+                            ImageList = productImages.Where(pi => pi.ProductId == p.Id).Select(i => new Images
                             {
                                 ProductImageId = i.Id,
                                 URL = i.Url

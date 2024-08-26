@@ -8,6 +8,7 @@ namespace ApplicationCore.DTOs.ProductDTOs
 {
     public class UpdateProductDTO
     {
+        public int CategoryId { get; set; }
         public int ProductId { get; set; }
         public string SPU { get; set; }
         public string ProductName { get; set; }
