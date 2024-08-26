@@ -15,13 +15,13 @@ namespace ApplicationCore.Services
         private readonly ILogger<ProductService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specrepository)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specRepo)
         {
             _productRepo = productRepo;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _productImageRepo = unitOfWork.GetRepository<ProductImage>();
-            _specRepo = specrepository;
+            _specRepo = specRepo;
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -75,6 +75,7 @@ namespace ApplicationCore.Services
         public async Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
         {
             var product = _productRepo.GetById(productId);
+            product.CategoryId = updateProductDTO.CategoryId;
             product.Spu = updateProductDTO.SPU;
             product.ProductName = updateProductDTO.ProductName;
             product.Enable = updateProductDTO.Enable;
