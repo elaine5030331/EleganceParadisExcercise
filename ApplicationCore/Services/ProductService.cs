@@ -204,7 +204,7 @@ namespace ApplicationCore.Services
                             Description = p.Description,
                             Enable = p.Enable,
                             CreateAt = p.CreateAt.ToLocalTime().ToString("yyyy/MM/dd"),
-                            SpecList = specs.Select(s => new SpecItems
+                            SpecList = specs.Where(s => s.ProductId == p.Id).Select(s => new SpecItems
                             {
                                 SpecId = s.Id,
                                 SKU = s.Sku,
@@ -212,7 +212,7 @@ namespace ApplicationCore.Services
                                 UnitPrice = s.UnitPrice,
                                 StockQuantity = s.StockQuantity,
                             }).ToList(),
-                            ImageList = productImages.Select(i => new Images
+                            ImageList = productImages.Where(pi => pi.ProductId == p.Id).Select(i => new Images
                             {
                                 ProductImageId = i.Id,
                                 URL = i.Url
