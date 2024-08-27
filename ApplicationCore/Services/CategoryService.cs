@@ -47,24 +47,34 @@ namespace ApplicationCore.Services
 
         public async Task<List<GetCategoriesResponse>> GetCategories()
         {
-            var parentCategory = (await _categoryRepo.ListAsync(x => x.ParentCategoryId == null && !x.IsDelete)).OrderBy(x => x.Order);
-            var childrenCategory = await _categoryRepo.ListAsync(c => !c.IsDelete && parentCategory.Select(pc => pc.Id).Contains(c.ParentCategoryId.Value));
-            return parentCategory.Select(pc => new GetCategoriesResponse
+            var categoryEntity = (await _categoryRepo.ListAsync(c => !c.IsDelete)).OrderBy(c => c.Order).ToList();
+
+            var categories = GetCategories(categoryEntity, null);
+            return categories;
+        }
+
+        private static List<GetCategoriesResponse> GetCategories(List<Category> categoryEntity, int? parentCategoryId)
+        {
+            if (categoryEntity == null || categoryEntity.Count < 1) return null;
+            var categoryResult = new List<GetCategoriesResponse>();
+            var categories = categoryEntity.Where(c => c.ParentCategoryId == parentCategoryId).ToList();
+
+            if (categories.Count < 1) return null;
+
+            foreach (var item in categories)
             {
-                Id = pc.Id,
-                Description = pc.Description,
-                ImageURL = pc.ImageUrl,
-                Name = pc.Name,
-                Order = pc.Order,
-                SubCategory = childrenCategory.Where(x => x.ParentCategoryId.Value == pc.Id).Select(c => new GetCategoriesResponse
+                var category = new GetCategoriesResponse
                 {
-                    Id = c.Id,
-                    Description = c.Description,
-                    ImageURL = c.ImageUrl,
-                    Name = c.Name,
-                    Order = c.Order
-                }).ToList()
-            }).ToList();
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    ImageURL = item.ImageUrl,
+                    Order = item.Order,
+                    SubCategory = GetCategories(categoryEntity, item.Id)
+                };
+                categoryResult.Add(category);
+            }
+            return categoryResult;
         }
 
         public async Task<OperationResult> UpdateCategoryInfoAsync(UpdateCategoryInfoRequest request)
