@@ -15,40 +15,40 @@ namespace Infrastructure.Data.Services
             _connection = connection;
         }
 
-        public async Task<List<GetProductListDTO>> GetProducts(int categoryId)
-        {
-            var parameter = new { CategoryId = categoryId };
-            var getProductsQuerySql = @"WITH MinUnitPrice_CTE(ProductId, MinUnitPrice)
-                                        AS(
-	                                        SELECT
-		                                        ProductId,
-		                                        MIN(UnitPrice)
-	                                        FROM Specs
-	                                        GROUP BY ProductId
-                                        )
-                                        SELECT 
-                                            Categories.Id AS CategoryId,
-                                            Products.Id AS ProductId,
-                                            Categories.Name AS CategoryName,
-                                            ProductName,
-                                            MinUnitPrice_CTE.MinUnitPrice AS UnitPrice,
-                                            (
-		                                        SELECT TOP 1
-			                                        ProductImages.URL
-		                                        FROM ProductImages
-		                                        WHERE ProductImages.ProductId = Products.Id
-		                                        ORDER BY ProductImages.[Order]
-	                                        ) AS ProductImageUrl
-                                        FROM Products 
-                                        JOIN MinUnitPrice_CTE ON MinUnitPrice_CTE.ProductId = Products.Id
-                                        JOIN Categories ON Categories.Id = Products.CategoryId 
-                                        WHERE Categories.Id = @CategoryId
-                                        AND Products.IsDelete = 0
-                                        AND Products.Enable = 1
-                                        ORDER BY Products.[Order], Products.CreateAt";
+        //public async Task<List<GetProductListDTO>> GetProducts(int categoryId)
+        //{
+        //    var parameter = new { CategoryId = categoryId };
+        //    var getProductsQuerySql = @"WITH MinUnitPrice_CTE(ProductId, MinUnitPrice)
+        //                                AS(
+	       //                                 SELECT
+		      //                                  ProductId,
+		      //                                  MIN(UnitPrice)
+	       //                                 FROM Specs
+	       //                                 GROUP BY ProductId
+        //                                )
+        //                                SELECT 
+        //                                    Categories.Id AS CategoryId,
+        //                                    Products.Id AS ProductId,
+        //                                    Categories.Name AS CategoryName,
+        //                                    ProductName,
+        //                                    MinUnitPrice_CTE.MinUnitPrice AS UnitPrice,
+        //                                    (
+		      //                                  SELECT TOP 1
+			     //                                   ProductImages.URL
+		      //                                  FROM ProductImages
+		      //                                  WHERE ProductImages.ProductId = Products.Id
+		      //                                  ORDER BY ProductImages.[Order]
+	       //                                 ) AS ProductImageUrl
+        //                                FROM Products 
+        //                                JOIN MinUnitPrice_CTE ON MinUnitPrice_CTE.ProductId = Products.Id
+        //                                JOIN Categories ON Categories.Id = Products.CategoryId 
+        //                                WHERE Categories.Id = @CategoryId
+        //                                AND Products.IsDelete = 0
+        //                                AND Products.Enable = 1
+        //                                ORDER BY Products.[Order], Products.CreateAt";
 
-            return (await _connection.QueryAsync<GetProductListDTO>(getProductsQuerySql, parameter)).ToList();
-        }
+        //    return (await _connection.QueryAsync<GetProductListDTO>(getProductsQuerySql, parameter)).ToList();
+        //}
 
         public async Task<ProductDTO> GetProductById(int productId)
         {

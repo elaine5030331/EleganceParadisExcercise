@@ -13,5 +13,6 @@ namespace ApplicationCore.Interfaces
         Task<OperationResult> AddProductImagesAsync(int productId, List<string> imageUrlList);
         Task<OperationResult<UpdateProductImagesResponse>> UpdateProductImagesAsync(int productId, List<string> imageUrlList);
         Task<OperationResult<GetAllProductsResponse>> GetAllProductsAsync(GetAllProductsRequest request);
+        Task<List<GetProductListDTO>> GetProducts(int categoryId);
     }
 }

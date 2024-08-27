@@ -14,14 +14,16 @@ namespace ApplicationCore.Services
         private readonly IRepository<Spec> _specRepo;
         private readonly ILogger<ProductService> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IRepository<Category> _categoryRepo;
 
-        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specRepo)
+        public ProductService(IRepository<Product> productRepo, ILogger<ProductService> logger, IRepository<ProductImage> productImageRepo, IUnitOfWork unitOfWork, IRepository<Spec> specRepo, IRepository<Category> categoryRepo)
         {
             _productRepo = productRepo;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _productImageRepo = unitOfWork.GetRepository<ProductImage>();
             _specRepo = specRepo;
+            _categoryRepo = categoryRepo;
         }
 
         public async Task<OperationResult<AddProductResponse>> AddProductAsync(AddProductDTO addProductDTO)
@@ -158,7 +160,7 @@ namespace ApplicationCore.Services
 
                 return new OperationResult<UpdateProductImagesResponse>("商品圖片更新失敗");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 await _unitOfWork.RollbackAsync();
@@ -176,7 +178,7 @@ namespace ApplicationCore.Services
             {
                 List<Product> products = new List<Product>();
 
-                if(request.CategoryId != null)
+                if (request.CategoryId != null)
                 {
                     products = await _productRepo.ListAsync(p => p.CategoryId == request.CategoryId && !p.IsDelete);
                 }
@@ -227,6 +229,50 @@ namespace ApplicationCore.Services
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult<GetAllProductsResponse>("取得商品清單失敗");
             }
+        }
+
+        public async Task<List<GetProductListDTO>> GetProducts(int categoryId)
+        {
+            var categoryEntities = await _categoryRepo.ListAsync(c => !c.IsDelete);
+            var category = categoryEntities.FirstOrDefault(c => c.Id == categoryId);
+            if (category == null) return new List<GetProductListDTO>();
+
+            var categoryIdList = new List<int>();
+            var temp = new List<int>();
+
+            categoryIdList.Add(category.Id);
+            temp.Add(category.Id);
+            while (temp.Count > 0)
+            {
+                var subCategoryIds = categoryEntities.Where(c => c.ParentCategoryId != null && temp.Contains(c.ParentCategoryId.Value)).Select(c => c.Id).ToList();
+                categoryIdList.AddRange(subCategoryIds);
+                temp = subCategoryIds;
+            }
+
+            var products = (await _productRepo.ListAsync(p => categoryIdList.Contains(p.CategoryId) && p.Enable && !p.IsDelete));
+
+            var productImages = (await _productImageRepo.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId)))
+                                                        .OrderBy(pi => pi.Order);
+
+            var specs = (await _specRepo.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId)))
+                        .OrderBy(s => s.Order)
+                        .ThenBy(s => s.UnitPrice);
+
+            var result = products.OrderBy(p => p.Order)
+                                 .Select(p =>
+                                 {
+                                     var productSpec = specs.Where(s => s.ProductId == p.Id).FirstOrDefault();
+                                     return new GetProductListDTO
+                                     {
+                                         CategoryId = p.CategoryId,
+                                         ProductId = p.Id,
+                                         CategoryName = categoryEntities.FirstOrDefault(c => c.Id == p.CategoryId)?.Name ?? "預設分類",
+                                         ProductName = p.ProductName,
+                                         UnitPrice = productSpec?.UnitPrice ?? -1,
+                                         ProductImageUrl = productImages.FirstOrDefault(pi => pi.ProductId == p.Id)?.Url ?? "https://eleganceparadisapp.azurewebsites.net/images/item_1.webp"
+                                     };
+                                 });
+            return result.ToList();
         }
     }
 }
