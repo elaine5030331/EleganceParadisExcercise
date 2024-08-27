@@ -1,4 +1,4 @@
-﻿using ApplicationCore.DTOs;
+﻿using ApplicationCore.DTOs.SpecDTOs;
 using ApplicationCore.Models;
 
 namespace ApplicationCore.Interfaces

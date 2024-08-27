@@ -1,6 +1,6 @@
 ﻿using ApplicationCore.Constants;
-using ApplicationCore.DTOs;
 using ApplicationCore.DTOs.ProductDTOs;
+using ApplicationCore.DTOs.SpecDTOs;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
 using Microsoft.AspNetCore.Authorization;
