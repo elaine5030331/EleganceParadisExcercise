@@ -18,7 +18,7 @@ namespace EleganceParadisAPI.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet("GetAllCategory")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllCategory()
         {
