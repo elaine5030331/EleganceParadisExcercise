@@ -58,7 +58,7 @@ namespace EleganceParadisAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetProductsByCategory(int categoryId)
         {
-            var result = await _productQueryService.GetProducts(categoryId);
+            var result = await _productService.GetProducts(categoryId);
             return Ok(result);
         }
 
