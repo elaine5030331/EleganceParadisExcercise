@@ -1,6 +1,6 @@
 ﻿using ApplicationCore.Constants;
-using ApplicationCore.DTOs.AdminDTOs.AccountDTOs;
-using ApplicationCore.Interfaces.AdminInterfaces;
+using ApplicationCore.DTOs.AdminAccountDTOs;
+using ApplicationCore.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
