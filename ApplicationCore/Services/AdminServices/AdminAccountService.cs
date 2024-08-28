@@ -24,6 +24,26 @@ namespace ApplicationCore.Services.AdminServices
             _logger = logger;
         }
 
+        public async Task<List<GetAllAccountsResponse>> GetAllAccountsAsync()
+        {
+            var accounts = await _accountRepo.ListAsync(a => a.Id > -1);
+
+            if (accounts == null || accounts.Count < 1)
+                return new List<GetAllAccountsResponse>();
+
+            var result = accounts.Select(a => new GetAllAccountsResponse
+            {
+                AccountId = a.Id,
+                AccountName = a.Name,
+                Email = a.Email,
+                Mobile = a.Mobile,
+                CreateAt = a.CreateAt.ToLocalTime().ToString("yyyy/MM/dd"),
+                Status = (int)a.Status
+            }).ToList();
+
+            return result;
+        }
+
         public async Task<OperationResult<GetAccountByIdResponse>> GetAccountByIdAsync(int accountId)
         {
             try

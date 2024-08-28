@@ -10,6 +10,7 @@ namespace ApplicationCore.Interfaces.AdminInterfaces
 {
     public interface IAdminAccountService
     {
+        Task<List<GetAllAccountsResponse>> GetAllAccountsAsync();
         Task<OperationResult<GetAccountByIdResponse>> GetAccountByIdAsync(int accountId);
     }
 }

@@ -19,6 +19,30 @@ namespace EleganceParadisAPI.AdminControllers
         }
 
         /// <summary>
+        /// 取得所有會員資料
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample response:<br/>
+        ///     [
+        ///         {
+        ///             "accountId": 2,
+        ///             "email": "test@gmail.com",
+        ///             "accountName": "test1",
+        ///             "mobile": "0912345678",
+        ///             "createAt": "2024/07/22",
+        ///             "status": 2   //Unverified = 1, Verified = 2, Blacklist = 3
+        ///         }
+        ///     ]
+        ///</remarks>
+        [HttpGet("GetAllAccounts")]
+        public async Task<IActionResult> GetAllAccounts()
+        {
+            var result = await _adminAccountService.GetAllAccountsAsync();
+            return Ok(result);
+        }
+
+        /// <summary>
         /// 取得會員資料by accountId
         /// </summary>
         /// <param name="accountId"></param>
