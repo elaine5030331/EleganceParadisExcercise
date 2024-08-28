@@ -14,6 +14,7 @@ namespace EleganceParadisAPI.Configurations
         public static IServiceCollection AddApplicationCoreServices(this IServiceCollection services) 
         {
             services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
+            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IUnitOfWork, EFUnitOfWork>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddTransient<IProductQueryService, ProductQueryService>();

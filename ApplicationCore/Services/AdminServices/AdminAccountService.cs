@@ -15,10 +15,10 @@ namespace ApplicationCore.Services.AdminServices
 {
     public class AdminAccountService : IAdminAccountService
     {
-        private readonly IRepository<Account> _accountRepo;
+        private readonly IAccountRepository _accountRepo;
         private readonly ILogger<AdminAccountService> _logger;
 
-        public AdminAccountService(IRepository<Account> accountRepo, ILogger<AdminAccountService> logger)
+        public AdminAccountService(IAccountRepository accountRepo, ILogger<AdminAccountService> logger)
         {
             _accountRepo = accountRepo;
             _logger = logger;
@@ -26,7 +26,7 @@ namespace ApplicationCore.Services.AdminServices
 
         public async Task<List<GetAllAccountsResponse>> GetAllAccountsAsync()
         {
-            var accounts = await _accountRepo.ListAsync(a => a.Id > -1);
+            var accounts = await _accountRepo.GetAllAsync();
 
             if (accounts == null || accounts.Count < 1)
                 return new List<GetAllAccountsResponse>();
