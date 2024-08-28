@@ -72,5 +72,30 @@ namespace ApplicationCore.Services.AdminServices
                 return new OperationResult<GetAccountByIdResponse>("取得會員資料失敗");
             }
         }
+
+        public async Task<OperationResult> UpdateAccountInfoAsync(UpdateAdminAccountInfoRequest request)
+        {
+            try
+            {
+                var account = await _accountRepo.GetByIdAsync(request.AccountId);
+                if (account == null) return new OperationResult("找不到對應的Account");
+
+                if (!Enum.IsDefined(typeof(AccountStatus), request.Status))
+                    return new OperationResult("無此會員狀態");
+
+                account.Status = (AccountStatus)request.Status;
+                await _accountRepo.UpdateAsync(account);
+                return new OperationResult()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogError(ex, ex.Message);
+                return new OperationResult("更新會員資料失敗");
+            }
+            
+        }
     }
 }

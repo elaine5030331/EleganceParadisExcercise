@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Constants;
+using ApplicationCore.DTOs.AdminDTOs.AccountDTOs;
 using ApplicationCore.Interfaces.AdminInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -69,6 +70,31 @@ namespace EleganceParadisAPI.AdminControllers
             var result = await _adminAccountService.GetAccountByIdAsync(accountId);
             if(result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
+        }
+
+        /// <summary>
+        /// 更新會員資料
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <response code ="200">更新會員資料成功</response>
+        /// <response code ="400">
+        /// 1. 參數異常
+        /// 2. 找不到對應的Account
+        /// 3. 更新會員資料失敗
+        /// 4. 無此會員狀態
+        /// </response>
+        [HttpPut("UpdateAccountInfo/{accountId}")]
+        public async Task<IActionResult> UpdateAccountInfo(int accountId, UpdateAdminAccountInfoRequest request)
+        {
+            if (accountId != request.AccountId)
+                return BadRequest("參數異常");
+
+            var result = await _adminAccountService.UpdateAccountInfoAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+
         }
     }
 }
