@@ -1,6 +1,6 @@
 ﻿using ApplicationCore.Models;
 
-namespace ApplicationCore.DTOs.AdminDTOs.AccountDTOs
+namespace ApplicationCore.DTOs.AdminAccountDTOs
 {
     public class GetAccountByIdResponse : BaseOperationResult
     {

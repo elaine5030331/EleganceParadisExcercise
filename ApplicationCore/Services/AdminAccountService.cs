@@ -1,8 +1,7 @@
-﻿using ApplicationCore.DTOs.AdminDTOs.AccountDTOs;
+﻿using ApplicationCore.DTOs.AdminAccountDTOs;
 using ApplicationCore.Entities;
 using ApplicationCore.Enums;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Interfaces.AdminInterfaces;
 using ApplicationCore.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Services.AdminServices
+namespace ApplicationCore.Services
 {
     public class AdminAccountService : IAdminAccountService
     {
@@ -49,7 +48,7 @@ namespace ApplicationCore.Services.AdminServices
             try
             {
                 var account = await _accountRepo.GetByIdAsync(accountId);
-                if(account == null) 
+                if (account == null)
                     return new OperationResult<GetAccountByIdResponse>("找不到對應的AccountId");
 
                 return new OperationResult<GetAccountByIdResponse>()
@@ -90,12 +89,12 @@ namespace ApplicationCore.Services.AdminServices
                     IsSuccess = true
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger?.LogError(ex, ex.Message);
                 return new OperationResult("更新會員資料失敗");
             }
-            
+
         }
     }
 }

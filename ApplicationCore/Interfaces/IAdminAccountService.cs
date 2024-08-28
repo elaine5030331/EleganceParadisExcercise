@@ -1,5 +1,5 @@
 ﻿using ApplicationCore.DTOs.AccountDTOs;
-using ApplicationCore.DTOs.AdminDTOs.AccountDTOs;
+using ApplicationCore.DTOs.AdminAccountDTOs;
 using ApplicationCore.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApplicationCore.Interfaces.AdminInterfaces
+namespace ApplicationCore.Interfaces
 {
     public interface IAdminAccountService
     {

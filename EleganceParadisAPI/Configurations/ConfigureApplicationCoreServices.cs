@@ -1,7 +1,5 @@
 ﻿using ApplicationCore.Interfaces;
-using ApplicationCore.Interfaces.AdminInterfaces;
 using ApplicationCore.Services;
-using ApplicationCore.Services.AdminServices;
 using EleganceParadisAPI.Services;
 using Infrastructure.Data;
 using Infrastructure.Data.Services;
