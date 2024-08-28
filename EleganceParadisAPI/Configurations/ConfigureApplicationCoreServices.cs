@@ -1,5 +1,7 @@
 ﻿using ApplicationCore.Interfaces;
+using ApplicationCore.Interfaces.AdminInterfaces;
 using ApplicationCore.Services;
+using ApplicationCore.Services.AdminServices;
 using EleganceParadisAPI.Services;
 using Infrastructure.Data;
 using Infrastructure.Data.Services;
@@ -25,6 +27,7 @@ namespace EleganceParadisAPI.Configurations
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IAdminAccountService, AdminAccountService>();
             return services;
         }
     }
