@@ -76,37 +76,42 @@ namespace ApplicationCore.Services
 
         public async Task<OperationResult> UpdateProductAsync(int productId, UpdateProductDTO updateProductDTO)
         {
-            var product = _productRepo.GetById(productId);
-            product.CategoryId = updateProductDTO.CategoryId;
-            product.Spu = updateProductDTO.SPU;
-            product.ProductName = updateProductDTO.ProductName;
-            product.Enable = updateProductDTO.Enable;
-            product.Description = updateProductDTO.Description;
             try
             {
+                var product = _productRepo.GetById(productId);
+                if (product == null) return new OperationResult("找不到對應的商品");
+
+                product.CategoryId = updateProductDTO.CategoryId;
+                product.Spu = updateProductDTO.SPU;
+                product.ProductName = updateProductDTO.ProductName;
+                product.Enable = updateProductDTO.Enable;
+                product.Description = updateProductDTO.Description;
+
                 await _productRepo.UpdateAsync(product);
                 return new OperationResult();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new OperationResult("更新失敗");
+                return new OperationResult("更新商品資料失敗");
             }
         }
 
         public async Task<OperationResult> DeleteProductAsync(int id)
         {
-            var product = await _productRepo.GetByIdAsync(id);
-            product.IsDelete = true;
             try
             {
+                var product = await _productRepo.GetByIdAsync(id);
+                if (product == null) return new OperationResult("找不到對應的商品");
+
+                product.IsDelete = true;
                 await _productRepo.UpdateAsync(product);
                 return new OperationResult();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new OperationResult("刪除失敗");
+                return new OperationResult("刪除商品失敗");
             }
         }
 
