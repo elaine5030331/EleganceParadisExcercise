@@ -41,6 +41,8 @@ namespace EleganceParadisAPI.Controllers
         ///         "accountStatus": 2  //Unverified = 1, Verified = 2, Blacklist = 3
         ///     }
         /// </remarks>
+        /// <response code ="200">登入成功</response>
+        /// <response code ="400">帳號或密碼有誤，請重新輸入</response>
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDTO loginInfo)
         {
@@ -53,25 +55,6 @@ namespace EleganceParadisAPI.Controllers
                                                 }));
             }
             return BadRequest("帳號或密碼有誤，請重新輸入");
-        }
-
-        /// <summary>
-        /// 後台登入
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <response code ="200">登入成功</response>
-        /// <response code ="400">帳號或密碼有誤</response>
-        [HttpPost("AdminLogin")]
-        public IActionResult AdminLogin(AdminLoginRequest request)
-        {
-            var accountName = _adminInfoSettings.AccountName;
-            var password = _adminInfoSettings.Password;
-
-            if (accountName != request.AccountName || password != request.Password)
-                return BadRequest("帳號或密碼有誤，請重新輸入");
-
-            return Ok(_jwtService.GenerateAdminToken(accountName));
         }
 
         /// <summary>
