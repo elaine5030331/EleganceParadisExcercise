@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.AdminControllers
 {
-    [Route("api/AdminSpecController")]
+    [Route("api/AdminSpec")]
     [ApiController]
     [Authorize(Roles = EleganceParadisRole.Admin)]
     public class AdminSpecController : ControllerBase

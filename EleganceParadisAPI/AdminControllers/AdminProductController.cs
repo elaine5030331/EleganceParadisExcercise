@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.AdminControllers
 {
-    [Route("api/AdminProductController")]
+    [Route("api/AdminProduct")]
     [ApiController]
     [Authorize(Roles = EleganceParadisRole.Admin)]
     public class AdminProductController : ControllerBase
