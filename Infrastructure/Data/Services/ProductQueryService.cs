@@ -71,6 +71,7 @@ namespace Infrastructure.Data.Services
                         JOIN Categories ON Categories.Id = Products.CategoryId
                         WHERE Products.Id = @ProductId
                         AND Products.IsDelete = 0
+                        AND Products.Enable = 1
                         ORDER BY Products.[Order], Products.CreateAt, SpecOrder, Specs.CreateAt";
 
             var queryResult = (await _connection.QueryAsync<ProductQueryResultDTO>(sql, parameter)).ToList();
