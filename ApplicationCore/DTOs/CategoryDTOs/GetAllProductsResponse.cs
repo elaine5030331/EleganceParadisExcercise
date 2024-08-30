@@ -11,7 +11,7 @@ namespace ApplicationCore.DTOs.CategoryDTOs
     public class ProductItem
     {
         public int CategoryId { get; set; }
-
+        public string CategoryName { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string SPU { get; set; }
