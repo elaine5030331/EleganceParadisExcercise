@@ -14,5 +14,6 @@ namespace ApplicationCore.Interfaces
         Task<OperationResult<UpdateProductImagesResponse>> UpdateProductImagesAsync(int productId, List<string> imageUrlList);
         Task<OperationResult<GetAllProductsResponse>> GetAllProductsAsync(GetAllProductsRequest request);
         Task<List<GetProductListDTO>> GetProducts(int categoryId);
+        Task<OperationResult> UpdateProductOrderAsync(UpdateProductOrderRequest request);
     }
 }

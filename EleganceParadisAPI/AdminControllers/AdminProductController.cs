@@ -169,5 +169,24 @@ namespace EleganceParadisAPI.AdminControllers
             if (result.IsSuccess) return Ok(result.ResultDTO);
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 更新商品順序
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <response code ="200">更新商品順序成功</response>
+        /// <response code ="400">
+        /// 1. 目前尚未建立商品資料
+        /// 2. 參數異常
+        /// 3. 更新商品順序失敗
+        /// </response>
+        [HttpPut("UpdateProductOrder")]
+        public async Task<IActionResult> UpdateProductOrder(UpdateProductOrderRequest request)
+        {
+            var result = await _productService.UpdateProductOrderAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }
