@@ -9,12 +9,14 @@ namespace ApplicationCore.Services
     public class SpecService : ISpecService
     {
         private readonly IRepository<Spec> _specRepository;
+        private readonly IRepository<Product> _productRepository;
         private readonly ILogger<SpecService> _logger;
 
-        public SpecService(IRepository<Spec> specRepository, ILogger<SpecService> logger)
+        public SpecService(IRepository<Spec> specRepository, ILogger<SpecService> logger, IRepository<Product> productRepository)
         {
             _specRepository = specRepository;
             _logger = logger;
+            _productRepository = productRepository;
         }
 
         public async Task<OperationResult> AddSpecAsync(AddSpecDTO specDTO)
@@ -34,7 +36,7 @@ namespace ApplicationCore.Services
                 await _specRepository.AddAsync(spec);
                 return new OperationResult();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return new OperationResult("商品規格新增失敗");
@@ -57,7 +59,7 @@ namespace ApplicationCore.Services
                 await _specRepository.UpdateAsync(spec);
                 return new OperationResult();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new OperationResult("商品規格更新失敗");
             }
@@ -75,8 +77,37 @@ namespace ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,ex.Message);
+                _logger.LogError(ex, ex.Message);
                 return new OperationResult("商品規格刪除失敗");
+            }
+        }
+
+        public async Task<OperationResult> UpdateSpecOrderAsync(UpdateSpecOrderRequest request)
+        {
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(request.ProductId);
+                if (product == null || product.IsDelete) return new OperationResult("ProductId無法找到對應的商品");
+
+                var specs = await _specRepository.ListAsync(s => s.ProductId == request.ProductId);
+                if (specs == null) return new OperationResult("目前尚未建立對應的商品規格");
+
+                var specIds = specs.Select(s => s.Id);
+                var intersectList = request.SpecIdList.Intersect(specIds).ToList();
+                if (specs.Count != intersectList.Count) return new OperationResult("參數異常");
+
+                foreach (var spec in specs)
+                {
+                    spec.Order = request.SpecIdList.IndexOf(spec.Id);
+                }
+                await _specRepository.UpdateRangeAsync(specs);
+
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, ex.Message);
+                return new OperationResult("商品順序更新失敗");
             }
         }
     }

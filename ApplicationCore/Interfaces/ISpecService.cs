@@ -5,8 +5,9 @@ namespace ApplicationCore.Interfaces
 {
     public interface ISpecService
     {
-        public Task<OperationResult> AddSpecAsync(AddSpecDTO specDTO);
-        public Task<OperationResult> UpdateSpecAsync(UpdateSpecDTO updateSpecDTO);
-        public Task<OperationResult> DeleteSpecAsync(int specId);
+        Task<OperationResult> AddSpecAsync(AddSpecDTO specDTO);
+        Task<OperationResult> UpdateSpecAsync(UpdateSpecDTO updateSpecDTO);
+        Task<OperationResult> DeleteSpecAsync(int specId);
+        Task<OperationResult> UpdateSpecOrderAsync(UpdateSpecOrderRequest request);
     }
 }

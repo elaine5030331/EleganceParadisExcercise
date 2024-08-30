@@ -82,5 +82,25 @@ namespace EleganceParadisAPI.AdminControllers
             if (result.IsSuccess) return NoContent();
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 更新商品規格順序
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// /// <response code ="200">商品規格順序更新成功</response>
+        /// <response code ="400">
+        /// 1. ProductId無法找到對應的商品
+        /// 2. 目前尚未建立對應的商品規格
+        /// 3. 參數異常
+        /// 4. 商品順序更新失敗
+        /// </response>
+        [HttpPut("UpdateSpecOrder")]
+        public async Task<IActionResult> UpdateSpecOrder(UpdateSpecOrderRequest request)
+        {
+            var result = await _specService.UpdateSpecOrderAsync(request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }
