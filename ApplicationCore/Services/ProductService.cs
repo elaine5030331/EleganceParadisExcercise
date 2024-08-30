@@ -281,5 +281,31 @@ namespace ApplicationCore.Services
                                  });
             return result.ToList();
         }
+
+        public async Task<OperationResult> UpdateProductOrderAsync(UpdateProductOrderRequest request)
+        {
+            try
+            {
+                var products = await _productRepo.ListAsync(p => !p.IsDelete);
+                if (products == null) return new OperationResult("目前尚未建立商品資料");
+
+                var productIds = products.Select(p => p.Id).ToList();
+                var intersectList = request.ProductIdList.Intersect(productIds).ToList();
+                if (productIds.Count != intersectList.Count) return new OperationResult("參數異常");
+
+                foreach (var product in products)
+                {
+                    product.Order = request.ProductIdList.IndexOf(product.Id);
+                }
+
+                await _productRepo.UpdateRangeAsync(products);
+                return new OperationResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new OperationResult("更新商品順序失敗");
+            }
+        }
     }
 }
