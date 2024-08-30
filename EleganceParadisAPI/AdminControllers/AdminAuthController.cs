@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.AdminControllers
 {
-    [Route("api/AdminAuthController")]
+    [Route("api/AdminAuth")]
     [ApiController]
     public class AdminAuthController : ControllerBase
     {

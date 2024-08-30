@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EleganceParadisAPI.AdminControllers
 {
-    [Route("api/AdminCategoryController")]
+    [Route("api/AdminCategory")]
     [ApiController]
     [Authorize(Roles = EleganceParadisRole.Admin)]
     public class AdminCategoryController : ControllerBase
