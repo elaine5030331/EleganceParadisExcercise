@@ -196,7 +196,7 @@ namespace ApplicationCore.Services
                     return new OperationResult<GetAllProductsResponse>("目前尚未有商品");
 
                 products = products.OrderBy(p => p.Order).ToList();
-
+                var categories = await _categoryRepo.ListAsync(c => products.Select(p => p.CategoryId).Contains(c.Id));
                 var specs = (await _specRepo.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId))).OrderBy(s => s.Order);
                 var productImages = (await _productImageRepo.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId))).OrderBy(pi => pi.Order);
 
@@ -208,6 +208,7 @@ namespace ApplicationCore.Services
                         ProductList = products.Select(p => new ProductItem
                         {
                             CategoryId = p.CategoryId,
+                            CategoryName = categories.FirstOrDefault(c => c.Id == p.CategoryId)?.Name ?? string.Empty,
                             ProductId = p.Id,
                             ProductName = p.ProductName,
                             SPU = p.Spu,
