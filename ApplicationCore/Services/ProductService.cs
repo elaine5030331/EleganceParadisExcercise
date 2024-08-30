@@ -195,8 +195,10 @@ namespace ApplicationCore.Services
                 if (products.Count < 1)
                     return new OperationResult<GetAllProductsResponse>("目前尚未有商品");
 
-                var specs = await _specRepo.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId));
-                var productImages = await _productImageRepo.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId));
+                products = products.OrderBy(p => p.Order).ToList();
+
+                var specs = (await _specRepo.ListAsync(s => products.Select(p => p.Id).Contains(s.ProductId))).OrderBy(s => s.Order);
+                var productImages = (await _productImageRepo.ListAsync(pi => products.Select(p => p.Id).Contains(pi.ProductId))).OrderBy(pi => pi.Order);
 
                 return new OperationResult<GetAllProductsResponse>()
                 {
