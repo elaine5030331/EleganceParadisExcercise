@@ -129,5 +129,34 @@ namespace ApplicationCore.Services
                 return new OperationResult("商品類別刪除失敗");
             }
         }
+
+        public async Task<OperationResult> UpdateCategoryOrderAsync(int? parentCategoryId, UpdateCategoryOrderRequest request)
+        {
+            try
+            {
+                var categories = await _categoryRepo.ListAsync(c => !c.IsDelete);
+                if(categories == null)
+                    return new OperationResult("目前尚未建立商品類別");
+
+                var subCategories = categories.Where(c => c.ParentCategoryId == parentCategoryId);
+                var subCategoryIds = subCategories.Select(c => c.Id);
+                var intersectList = request.SubCategoryIdList.Intersect(subCategoryIds);
+                if (subCategoryIds.Count() != request.SubCategoryIdList.Count())
+                    return new OperationResult("參數異常");
+
+                foreach(var subCategory in subCategories)
+                {
+                    subCategory.Order = request.SubCategoryIdList.IndexOf(subCategory.Id);
+                }
+                await _categoryRepo.UpdateRangeAsync(subCategories);
+
+                return new OperationResult();
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogError(ex, ex.Message);
+                return new OperationResult("更新商品類別順序失敗");
+            }
+        }
     }
 }

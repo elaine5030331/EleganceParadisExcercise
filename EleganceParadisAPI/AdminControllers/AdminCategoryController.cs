@@ -95,5 +95,28 @@ namespace EleganceParadisAPI.AdminControllers
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
+
+        /// <summary>
+        /// 更新商品類別順序
+        /// </summary>
+        /// <param name="parentCategoryId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// /// <response code ="200">商品類別順序更新成功</response>
+        /// <response code ="400">
+        /// 1. 參數異常
+        /// 2. 目前尚未建立商品類別
+        /// 3. 更新商品類別順序失敗
+        /// </response>
+        [HttpPut("UpdateCategoryOrder/{parentCategoryId}")]
+        public async Task<IActionResult> UpdateCategoryOrder(int? parentCategoryId, UpdateCategoryOrderRequest request)
+        {
+            if (parentCategoryId != request.ParentCategoryId)
+                return BadRequest("參數異常");
+            var result = await _categoryService.UpdateCategoryOrderAsync(parentCategoryId, request);
+            if (result.IsSuccess) return Ok();
+            return BadRequest(result.ErrorMessage);
+        }
+
     }
 }
