@@ -9,5 +9,6 @@ namespace ApplicationCore.Interfaces
         Task<OperationResult> AddCategoryAsync(AddCategoryRequest request);
         Task<OperationResult> DeleteCategoryAsync(int categoryId);
         Task<OperationResult> UpdateCategoryInfoAsync(UpdateCategoryInfoRequest request);
+        Task<OperationResult> UpdateCategoryOrderAsync(int? parentCategoryId, UpdateCategoryOrderRequest request);
     }
 }
