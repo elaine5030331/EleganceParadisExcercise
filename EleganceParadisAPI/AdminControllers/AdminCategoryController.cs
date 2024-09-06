@@ -108,7 +108,7 @@ namespace EleganceParadisAPI.AdminControllers
         /// 2. 目前尚未建立商品類別
         /// 3. 更新商品類別順序失敗
         /// </response>
-        [HttpPut("UpdateCategoryOrder/{parentCategoryId}")]
+        [HttpPut("UpdateCategoryOrder/{parentCategoryId?}")]
         public async Task<IActionResult> UpdateCategoryOrder(int? parentCategoryId, UpdateCategoryOrderRequest request)
         {
             if (parentCategoryId != request.ParentCategoryId)

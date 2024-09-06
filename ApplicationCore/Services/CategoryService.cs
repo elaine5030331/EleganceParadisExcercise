@@ -141,7 +141,7 @@ namespace ApplicationCore.Services
                 var subCategories = categories.Where(c => c.ParentCategoryId == parentCategoryId);
                 var subCategoryIds = subCategories.Select(c => c.Id);
                 var intersectList = request.SubCategoryIdList.Intersect(subCategoryIds);
-                if (subCategoryIds.Count() != request.SubCategoryIdList.Count())
+                if (intersectList.Count() != request.SubCategoryIdList.Count())
                     return new OperationResult("參數異常");
 
                 foreach(var subCategory in subCategories)
