@@ -21,6 +21,14 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// WebPaymentURL:Line pay回傳的URL
+        /// </remarks>
+        /// <response code ="200">取得LinePay付款連結成功</response>
+        /// <response code ="400">
+        /// 1. 查無對應的訂單資訊
+        /// 2. 付款失敗
+        /// </response>
         [HttpGet("PayOrder")]
         [Authorize]
         public async Task<IActionResult> PayOrder(int orderId)
