@@ -36,9 +36,15 @@ namespace EleganceParadisAPI.Controllers
         ///     {
         ///        "name": "ElaineKang", 
         ///        "mobile": "0960123321", (格式：需為09開頭，並且電話號碼長度為10)
-        ///        "email": "ek@gmail.com", (格式：需包還 "@" 及 "." 字元)
+        ///        "email": "test@gmail.com", (格式：需包還 "@" 及 "." 字元)
         ///        "password": "Aa*1234", (格式: 長度為6-20，需包含至少一個英文大寫、英文小寫、數字及符號)
         ///        "confirmedPassword": "Aa*1234" (需與密碼相同)
+        ///     }
+        /// Sample response:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///         "email": "test@gmail.com",
+        ///         "name": "ElaineKang"
         ///     }
         /// </remarks>
         /// <response code ="200">新增使用者成功</response>
@@ -62,7 +68,20 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="id">accountId(可不帶)</param>
         /// <returns></returns>
-        /// <response code ="200"></response>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///        "accountId": 2,
+        ///     }
+        /// Sample response:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///         "name": "ElaineKang"
+        ///         "email": "test@gmail.com",
+        ///         "mobile": "0960123321"
+        ///     }
+        /// </remarks>
+        /// <response code ="200">取得使用者資料成功</response>
         /// <response code ="400">查無此人</response>
         [HttpGet("GetAccount/{id?}")]
         public async Task<IActionResult> GetAccount(int? id)
@@ -92,6 +111,20 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="accountInfo"></param>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///         "name": "ElaineKang",
+        ///         "email": "test@gmail.com",
+        ///         "mobile": "0960123321"
+        ///     }
+        /// Sample response:<br/>
+        ///         "accountId": 2,
+        ///         "name": "ElaineKang"
+        ///         "email": "test@gmail.com",
+        ///         "mobile": "0960123321"
+        /// </remarks>
         /// <response code ="200">更新個人資料成功</response>
         /// <response code ="400">
         /// 1. 請輸入名字
@@ -114,6 +147,18 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="accountInfo"></param>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///         "oldPassword": "Qaz*123",
+        ///         "newPassword": "Qaz*1234"(格式: 長度為6-20，需包含至少一個英文大寫、英文小寫、數字及符號)
+        ///     }
+        /// Sample response:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///     }
+        /// </remarks>
         /// <response code ="204">更新使用者密碼成功</response>
         /// <response code ="400">
         /// 1. 新密碼與舊密碼不可相同
@@ -143,6 +188,11 @@ namespace EleganceParadisAPI.Controllers
         /// </response>
         /// <remarks>
         /// encodingParameter: API導回前台的Query string <br/>
+        /// Sample response:<br/>
+        ///     {
+        ///         "accountId": 2,
+        ///         "email": "test@gmail.com"
+        ///     }
         /// </remarks>
         [HttpGet("VerifyEmail/{encodingParameter}")]
         [AllowAnonymous]
@@ -163,6 +213,12 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///         "email": "test@gmail.com"
+        ///     }
+        /// </remarks>
         /// <response code ="200">發送重設密碼信件成功</response>
         /// <response code ="400">
         /// 1. 找不到對應的AccountId
@@ -182,6 +238,13 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="resetAccountPasswordDTO"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///         "encodingParameter": API導回前台的Query string
+        ///         "newPassword": "Qaz*1234"(格式: 長度為6-20，需包含至少一個英文大寫、英文小寫、數字及符號)
+        ///     }
+        /// </remarks>
         /// <response code ="200">重設密碼成功</response>
         /// <response code ="400">
         /// 1. 重設密碼參數異常
@@ -200,7 +263,7 @@ namespace EleganceParadisAPI.Controllers
             //    return BadRequest(verifyResult.ErrorMessage);
 
             var result = await _accountService.ResetAccountPasswordAsync(resetAccountPasswordDTO);
-            
+
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
@@ -210,6 +273,12 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///         "oldPassword": "Qaz*123"email": "test@gmail.com"
+        ///     }
+        /// </remarks>
         /// <response code ="200">信件已寄出</response>
         /// <response code ="400">
         /// 1. 找不到此用戶
@@ -224,5 +293,5 @@ namespace EleganceParadisAPI.Controllers
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
-    }   
+    }
 }
