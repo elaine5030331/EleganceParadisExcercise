@@ -30,6 +30,22 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="categoryId"></param>
         /// <returns></returns>
+        /// <remarks>
+        ///Sample response:<br/>
+        ///     {
+        ///         [
+        ///             {
+        ///               "categoryId": 3,
+        ///               "productId": 1,
+        ///               "categoryName": "香水",
+        ///               "productName": "木質調香水",
+        ///               "unitPrice": 999,
+        ///               "productImageUrl": "https://eleganceparadisapp.azurewebsites.net/images/item_1.webp"
+        ///             },
+        ///         ]
+        ///     }
+        /// </remarks>
+        /// <response code ="200">取得商品列表資訊成功</response>
         [HttpGet("GetProductsByCategory/{categoryId}")]
         public async Task<IActionResult> GetProductsByCategory(int categoryId)
         {
@@ -42,6 +58,35 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
+        /// <remarks>
+        ///Sample response:<br/>
+        ///     {
+        ///         "categoryId": 3,
+        ///         "productId": 6,
+        ///         "categoryName": "香水",
+        ///         "productName": "豬",
+        ///         "spu": "piggy",
+        ///         "description": "string",
+        ///         "specs": [
+        ///           {
+        ///             "specId": 5,
+        ///             "sku": "",
+        ///             "unitPrice": 0,
+        ///             "specName": "",
+        ///             "specOrder": 0,
+        ///             "stockQuantity": null
+        ///           }
+        ///         ],
+        ///         "productImages": [
+        ///           {
+        ///             "productImageId": 13,
+        ///             "productImageUrl": "https://res.cloudinary.com/dupxtirfd/image/upload/v1723474937/EleganceParadis/tpj9cnfpchssqyf0wjc4.jpg",
+        ///             "productImageOrder": 0
+        ///           }
+        ///         ]
+        ///     }
+        /// </remarks>
+        /// <response code ="200">取得商品資料By productId成功</response>
         /// <response code ="404">找不到此產品</response>
         [HttpGet("GetProductById/{productId}")]
         public async Task<IActionResult> GetProductById(int productId)
