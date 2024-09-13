@@ -23,6 +23,18 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
+        /// <remarks>
+        ///Sample response:<br/>
+        ///     {
+        ///        "fileName": "piggy.jpg",
+        ///        "url": "https://res.cloudinary.com/dupxtirfd/image/upload/v1726213331/EleganceParadis/thqa5pyzwsk8qdapfi1z.jpg"
+        ///     }
+        /// </remarks>
+        /// <response code ="200">上傳圖片成功</response>
+        /// <response code ="200">
+        /// 1. 檔案上傳格式有誤
+        /// 2. 圖片上傳API異常
+        /// </response>
         [HttpPost]
         public async Task<IActionResult> UploadIamge(List<IFormFile> files)
         {
