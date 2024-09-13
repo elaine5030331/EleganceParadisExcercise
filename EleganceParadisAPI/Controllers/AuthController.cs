@@ -32,6 +32,11 @@ namespace EleganceParadisAPI.Controllers
         /// <param name="loginInfo"></param>
         /// <returns></returns>
         /// <remarks>
+        ///Sample request:<br/>
+        ///     {
+        ///        "email": "string",
+        ///        "password": "string"
+        ///     }
         /// Sample response:<br/>
         ///     {
         ///         "accountId": 2,
@@ -62,6 +67,13 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        ///Sample request:<br/>
+        ///     {
+        ///        "refreshToken": "944e013cc69846ababc143340e3665ff"
+        ///     }
+        /// </remarks>
+        /// <response code ="200">登出成功</response>
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
@@ -74,6 +86,14 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Sample request:<br/>
+        ///     {
+        ///        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaiLCJqdGkiOiIzMDQyN2",
+        ///        "refreshToken": "944e013c569846ababc143340e3665ff"
+        ///     }
+        /// </remarks>
+        /// <response code ="200">更新AccessToken成功</response>
         /// <response code ="401"></response>
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)

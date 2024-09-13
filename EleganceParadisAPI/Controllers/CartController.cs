@@ -32,7 +32,68 @@ namespace EleganceParadisAPI.Controllers
         ///        "specId": 1(商品規格ID),
         ///        "quantity": 3(購物數量)"
         ///     }
+        /// Sample response:<br/>
+        ///      {
+        ///       "accountId": 2,
+        ///       "cartItems": [
+        ///         {
+        ///           "cartId": 2,
+        ///           "selectedSpecId": 2,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "100ml",
+        ///           "unitPrice": 7777,
+        ///           "quantity": 100,
+        ///           "stock": null, //(null: 無限庫存)
+        ///           "specs": [
+        ///             {
+        ///               "specId": 2,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 7777,
+        ///               "stock": null //(null: 無限庫存)
+        ///             }
+        ///           ]
+        ///         },
+        ///         {
+        ///         "cartId": 5,
+        ///           "selectedSpecId": 1,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "50ml",
+        ///           "unitPrice": 999,
+        ///           "quantity": 200,
+        ///           "stock": 4,
+        ///           "specs": [
+        ///             {
+        ///             "specId": 1,
+        ///               "specName": "50ml",
+        ///               "unitPrice": 999,
+        ///               "stock": 4
+        ///             },
+        ///             {
+        ///             "specId": 3,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 3999,
+        ///               "stock": 5
+        ///             }
+        ///           ]
+        ///         }
+        ///       ],
+        ///       "shippingFee": 130,
+        ///       "subTotal": 977500,
+        ///       "cartTotal": 977630,
+        ///       "paymentTypes": [
+        ///         {
+        ///           "type": 0,
+        ///           "displayName": "LinePay",
+        ///           "icon": ""
+        ///         }
+        ///       ]
+        ///     }
         /// </remarks>
+        /// <response code ="200">新增商品至購物車成功</response>
         /// <response code ="400">
         ///     1.找不到這個用戶 <br/>
         ///     2.找不到AccountId對應的用戶<br/>
@@ -56,13 +117,14 @@ namespace EleganceParadisAPI.Controllers
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
+        /// <response code ="200">取得購物車內容成功</response>
         /// <response code ="400">
         ///     1.找不到這個用戶 <br/>
         ///     2.找不到AccountId對應的用戶<br/>
         ///     3.加入購物車失敗(僅會回傳購物車原本的資料)
         /// </response>
         /// <remarks>
-        /// Sample request:<br/>
+        /// Sample response:<br/>
         ///      {
         ///       "accountId": 2,
         ///       "cartItems": [
@@ -154,7 +216,68 @@ namespace EleganceParadisAPI.Controllers
         ///        "specId": 1(商品規格ID),
         ///        "quantity": 3(購物數量)"
         ///     }
+        /// Sample response:<br/>
+        ///      {
+        ///       "accountId": 2,
+        ///       "cartItems": [
+        ///         {
+        ///           "cartId": 2,
+        ///           "selectedSpecId": 2,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "100ml",
+        ///           "unitPrice": 7777,
+        ///           "quantity": 100,
+        ///           "stock": null, //(null: 無限庫存)
+        ///           "specs": [
+        ///             {
+        ///               "specId": 2,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 7777,
+        ///               "stock": null //(null: 無限庫存)
+        ///             }
+        ///           ]
+        ///         },
+        ///         {
+        ///         "cartId": 5,
+        ///           "selectedSpecId": 1,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "50ml",
+        ///           "unitPrice": 999,
+        ///           "quantity": 200,
+        ///           "stock": 4,
+        ///           "specs": [
+        ///             {
+        ///             "specId": 1,
+        ///               "specName": "50ml",
+        ///               "unitPrice": 999,
+        ///               "stock": 4
+        ///             },
+        ///             {
+        ///             "specId": 3,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 3999,
+        ///               "stock": 5
+        ///             }
+        ///           ]
+        ///         }
+        ///       ],
+        ///       "shippingFee": 130,
+        ///       "subTotal": 977500,
+        ///       "cartTotal": 977630,
+        ///       "paymentTypes": [
+        ///         {
+        ///           "type": 0,
+        ///           "displayName": "LinePay",
+        ///           "icon": ""
+        ///         }
+        ///       ]
+        ///     }
         /// </remarks>
+        /// <response code ="200">更新購物車內容成功</response>
         /// <response code ="400">
         ///     1.找不到這個用戶 <br/>
         ///     2.找不到AccountId對應的用戶<br/>
@@ -183,7 +306,68 @@ namespace EleganceParadisAPI.Controllers
         ///        "accountId": 1, 
         ///        "cartId": 1(購物車ID)
         ///     }
+        /// Sample response:<br/>
+        ///      {
+        ///       "accountId": 2,
+        ///       "cartItems": [
+        ///         {
+        ///           "cartId": 2,
+        ///           "selectedSpecId": 2,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "100ml",
+        ///           "unitPrice": 7777,
+        ///           "quantity": 100,
+        ///           "stock": null, //(null: 無限庫存)
+        ///           "specs": [
+        ///             {
+        ///               "specId": 2,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 7777,
+        ///               "stock": null //(null: 無限庫存)
+        ///             }
+        ///           ]
+        ///         },
+        ///         {
+        ///         "cartId": 5,
+        ///           "selectedSpecId": 1,
+        ///           "categoryName": "香水",
+        ///           "productName": "木質調香水",
+        ///           "productImage": "",
+        ///           "specName": "50ml",
+        ///           "unitPrice": 999,
+        ///           "quantity": 200,
+        ///           "stock": 4,
+        ///           "specs": [
+        ///             {
+        ///             "specId": 1,
+        ///               "specName": "50ml",
+        ///               "unitPrice": 999,
+        ///               "stock": 4
+        ///             },
+        ///             {
+        ///             "specId": 3,
+        ///               "specName": "100ml",
+        ///               "unitPrice": 3999,
+        ///               "stock": 5
+        ///             }
+        ///           ]
+        ///         }
+        ///       ],
+        ///       "shippingFee": 130,
+        ///       "subTotal": 977500,
+        ///       "cartTotal": 977630,
+        ///       "paymentTypes": [
+        ///         {
+        ///           "type": 0,
+        ///           "displayName": "LinePay",
+        ///           "icon": ""
+        ///         }
+        ///       ]
+        ///     }
         /// </remarks>
+        /// <response code ="200">刪除購物車資料成功</response>
         /// <response code ="400">
         ///     1.找不到這個用戶 <br/>
         ///     2.找不到AccountId對應的用戶<br/>
