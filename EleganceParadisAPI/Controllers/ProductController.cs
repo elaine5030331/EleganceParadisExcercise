@@ -39,8 +39,19 @@ namespace EleganceParadisAPI.Controllers
         ///               "productId": 1,
         ///               "categoryName": "香水",
         ///               "productName": "木質調香水",
-        ///               "unitPrice": 999,
-        ///               "productImageUrl": "https://eleganceparadisapp.azurewebsites.net/images/item_1.webp"
+        ///               "productImageUrl": "https://eleganceparadisapp.azurewebsites.net/images/item_1.webp",
+        ///               "specList": [
+        ///                 {
+        ///                   "specId": 1,
+        ///                   "unitPrice": 999,
+        ///                   "stockQuantity": 25
+        ///                 },
+        ///                 {
+        ///                   "specId": 3,
+        ///                   "unitPrice": 3999,
+        ///                   "stockQuantity": 1
+        ///                 }
+        ///               ]
         ///             },
         ///         ]
         ///     }
