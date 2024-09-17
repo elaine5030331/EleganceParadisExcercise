@@ -4,6 +4,7 @@ using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
 using Microsoft.Extensions.Logging;
+using static ApplicationCore.DTOs.ProductDTOs.GetProductListDTO;
 
 namespace ApplicationCore.Services
 {
@@ -269,14 +270,20 @@ namespace ApplicationCore.Services
             var result = products.OrderBy(p => p.Order)
                                  .Select(p =>
                                  {
-                                     var productSpec = specs.Where(s => s.ProductId == p.Id).FirstOrDefault();
+                                     //var productSpec = specs.Where(s => s.ProductId == p.Id).FirstOrDefault();
                                      return new GetProductListDTO
                                      {
                                          CategoryId = p.CategoryId,
                                          ProductId = p.Id,
                                          CategoryName = categoryEntities.FirstOrDefault(c => c.Id == p.CategoryId)?.Name ?? "預設分類",
                                          ProductName = p.ProductName,
-                                         UnitPrice = productSpec?.UnitPrice ?? -1,
+                                         //UnitPrice = productSpec?.UnitPrice ?? -1,
+                                         SpecList = specs.Where(s => s.ProductId == p.Id).Select(s => new SpecItem
+                                         {
+                                             SpecId = s.Id,
+                                             UnitPrice = s.UnitPrice,
+                                             StockQuantity = s?.StockQuantity ?? 0,
+                                         }).ToList(),
                                          ProductImageUrl = productImages.FirstOrDefault(pi => pi.ProductId == p.Id)?.Url ?? "https://eleganceparadisapp.azurewebsites.net/images/item_1.webp"
                                      };
                                  });
