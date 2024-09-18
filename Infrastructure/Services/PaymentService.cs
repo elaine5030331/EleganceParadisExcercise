@@ -43,7 +43,8 @@ namespace Infrastructure.Services
             var order = await _orderService.GetOrderAsync(orderId);
             if (order == null) return new OperationResult<PayOrderByLineResponse>("查無對應的訂單資訊");
 
-            var total = order.OrderDetails.Sum(od => od.UnitPrice * od.Quantity);
+            var shippingFee = order.ShippingFee;
+            var total = order.OrderDetails.Sum(od => od.UnitPrice * od.Quantity) + shippingFee;
 
             //敲RequestAPI
             var lineApi = new LinePayApi(_linePayApiOptions);
