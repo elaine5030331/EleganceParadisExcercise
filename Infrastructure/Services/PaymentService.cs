@@ -40,7 +40,7 @@ namespace Infrastructure.Services
         public async Task<OperationResult<PayOrderByLineResponse>> PayOrderByLineAsync(int orderId)
         {
             //取出訂單資料
-            var order = await _orderService.GerOrderAsync(orderId);
+            var order = await _orderService.GetOrderAsync(orderId);
             if (order == null) return new OperationResult<PayOrderByLineResponse>("查無對應的訂單資訊");
 
             var total = order.OrderDetails.Sum(od => od.UnitPrice * od.Quantity);
