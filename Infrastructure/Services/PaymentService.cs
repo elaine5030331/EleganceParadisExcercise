@@ -90,27 +90,27 @@ namespace Infrastructure.Services
             };
 
             //TODO
-            //將transactionId存入資料庫
+            //將 transactionId 存入資料庫
         }
-        public async Task<OperationResult> ComfirmPaymentAsync(string transactionId, string orderNo)
+        public async Task<OperationResult> ConfirmPaymentAsync(string transactionId, string orderNo)
         {
             try
             {
-                //取得order資料，計算總金額
+                //取得 order 資料，計算總金額
                 var order = await _orderRepo.FirstOrDefaultAsync(o => o.OrderNo == orderNo);
                 if (order == null) return new OperationResult("查無對應的訂單資料");
                 var orderDetails = await _orderDetailRepo.ListAsync(od => od.OrderId == order.Id);
                 var total = orderDetails.Sum(od => od.UnitPrice * od.Quantity);
 
-                //敲ComfirmAPI
+                //敲ConfirmAPI
                 var lineApi = new LinePayApi(_linePayApiOptions);
                 var result = await lineApi.ConfirmAsync(transactionId, new ConfirmRequest
                 {
                     Amount = total,
                     Currency = "TWD"
                 });
-                //判斷ReturnCode是否為成功，成功改變orderStaus
-                if (result == null) return new OperationResult("comfirm失敗");
+                //判斷ReturnCode是否為成功，成功改變 orderStatus
+                if (result == null) return new OperationResult("confirm失敗");
                 if (result.ReturnCode != "0000") return new OperationResult(result.ReturnMessage);
 
                 order.OrderStatus = OrderStatus.Paid;
@@ -123,7 +123,7 @@ namespace Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new OperationResult("comfirm失敗");
+                return new OperationResult("confirm失敗");
             }
         }
     }
