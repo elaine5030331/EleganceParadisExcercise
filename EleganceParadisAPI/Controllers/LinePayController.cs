@@ -47,8 +47,8 @@ namespace EleganceParadisAPI.Controllers
         [HttpGet("ComfirmPayment")]
         public async Task<IActionResult> ComfirmPayment([FromQuery] string transactionId, [FromQuery] string orderId)
         {
-            var result = await _paymentService.ComfirmPaymentAsync(transactionId, orderId);
-            if (result.IsSuccess) return Redirect("https://eleganceparadisapp.azurewebsites.net/");
+            var result = await _paymentService.ConfirmPaymentAsync(transactionId, orderId);
+            if (result.IsSuccess) return Redirect($"https://eleganceparadisapp.azurewebsites.net/cart/finish?orderId={orderId}");
             return BadRequest(result.ErrorMessage);
         }
 

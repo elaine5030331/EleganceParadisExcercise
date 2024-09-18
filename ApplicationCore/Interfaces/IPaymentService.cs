@@ -11,6 +11,6 @@ namespace ApplicationCore.Interfaces
     public interface IPaymentService
     {
         Task<OperationResult<PayOrderByLineResponse>> PayOrderByLineAsync(int orderId);
-        Task<OperationResult> ComfirmPaymentAsync(string transactionId, string orderNo);
+        Task<OperationResult> ConfirmPaymentAsync(string transactionId, string orderNo);
     }
 }

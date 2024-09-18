@@ -12,6 +12,7 @@ namespace ApplicationCore.Interfaces
     {
         Task<OperationResult<CreateOrderResponse>> CreateOrderAsync(CreateOrderRequest request);
         Task<List<OrderResponse>> GerOrderListAsync(int accountId);
-        Task<OrderResponse> GerOrderAsync(int orderId);
+        Task<OrderResponse> GetOrderAsync(int orderId);
+        Task<OrderResponse> GetOrderAsync(int orderId, int accountId);
     }
 }

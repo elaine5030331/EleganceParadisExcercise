@@ -65,7 +65,8 @@ namespace Infrastructure.Data.Services
 	                        Specs.SKU AS SKU,
 	                        Specs.UnitPrice AS UnitPrice,
 	                        Specs.SpecName AS SpecName,
-	                        Specs.[Order] AS SpecOrder
+	                        Specs.[Order] AS SpecOrder,
+                            Specs.StockQuantity
                         FROM Products
                         JOIN Specs ON Specs.ProductId = Products.Id
                         JOIN Categories ON Categories.Id = Products.CategoryId

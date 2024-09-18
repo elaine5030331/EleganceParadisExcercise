@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.DTOs.OrderDTOS;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
+using EleganceParadisAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -118,7 +119,8 @@ namespace EleganceParadisAPI.Controllers
         [HttpGet("GetOrder/{orderId}")]
         public async Task<IActionResult> GetOrder(int orderId)
         {
-            var result = await _orderService.GerOrderAsync(orderId);
+            var accountId = User.GetAccountId();
+            var result = await _orderService.GetOrderAsync(orderId, accountId.Value);
             if (result == null) return NotFound();
             return Ok(result);
         }
