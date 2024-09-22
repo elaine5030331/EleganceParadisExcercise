@@ -43,8 +43,7 @@ namespace Infrastructure.Services
             var order = await _orderService.GetOrderAsync(orderId);
             if (order == null) return new OperationResult<PayOrderByLineResponse>("查無對應的訂單資訊");
 
-            var shippingFee = order.ShippingFee;
-            var total = order.OrderDetails.Sum(od => od.UnitPrice * od.Quantity) + shippingFee;
+            var total = order.TotalAmount;
 
             //敲RequestAPI
             var lineApi = new LinePayApi(_linePayApiOptions);
@@ -98,10 +97,10 @@ namespace Infrastructure.Services
             try
             {
                 //取得 order 資料，計算總金額
-                var order = await _orderRepo.FirstOrDefaultAsync(o => o.OrderNo == orderNo);
-                if (order == null) return new OperationResult("查無對應的訂單資料");
-                var orderDetails = await _orderDetailRepo.ListAsync(od => od.OrderId == order.Id);
-                var total = orderDetails.Sum(od => od.UnitPrice * od.Quantity);
+                var orderEntity = await _orderRepo.FirstOrDefaultAsync(o => o.OrderNo == orderNo);
+                var order = await _orderService.GetOrderAsync(orderEntity.Id);
+                if (orderEntity == null) return new OperationResult("查無對應的訂單資料");
+                var total = order.TotalAmount;
 
                 //敲ConfirmAPI
                 var lineApi = new LinePayApi(_linePayApiOptions);
@@ -114,8 +113,8 @@ namespace Infrastructure.Services
                 if (result == null) return new OperationResult("confirm失敗");
                 if (result.ReturnCode != "0000") return new OperationResult(result.ReturnMessage);
 
-                order.OrderStatus = OrderStatus.Paid;
-                await _orderRepo.UpdateAsync(order);
+                orderEntity.OrderStatus = OrderStatus.Paid;
+                await _orderRepo.UpdateAsync(orderEntity);
 
                 //TODO更新LinePay回傳資訊的資料表
 
