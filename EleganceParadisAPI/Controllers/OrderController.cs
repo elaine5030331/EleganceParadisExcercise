@@ -78,7 +78,7 @@ namespace EleganceParadisAPI.Controllers
         /// <summary>
         /// 取得單筆訂單
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="orderId">orderNo訂單編號</param>
         /// <returns></returns>
         /// <remarks>
         /// Sample request:<br/>
@@ -117,7 +117,7 @@ namespace EleganceParadisAPI.Controllers
         /// <response code ="200">取得單筆訂單成功</response>
         /// <response code ="404">找不到此訂單</response>
         [HttpGet("GetOrder/{orderId}")]
-        public async Task<IActionResult> GetOrder(int orderId)
+        public async Task<IActionResult> GetOrder(string orderId)
         {
             var accountId = User.GetAccountId();
             var result = await _orderService.GetOrderAsync(orderId, accountId.Value);
