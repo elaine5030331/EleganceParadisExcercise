@@ -174,11 +174,11 @@ namespace ApplicationCore.Services
             return GetOrderResponse(order, orderDetails);
         }
 
-        public async Task<OrderResponse> GetOrderAsync(int orderId, int accountId)
+        public async Task<OrderResponse> GetOrderAsync(string orderNo, int accountId)
         {
-            var order = await _orderRepository.FirstOrDefaultAsync(o => o.Id == orderId && o.AccountId == accountId);
+            var order = await _orderRepository.FirstOrDefaultAsync(o => o.OrderNo == orderNo && o.AccountId == accountId);
             if (order == null) return null;
-            var orderDetails = await _orderDetailRepository.ListAsync(o => o.OrderId == orderId);
+            var orderDetails = await _orderDetailRepository.ListAsync(o => o.OrderId == order.Id);
             if (orderDetails == null) return null;
 
             return GetOrderResponse(order, orderDetails);
