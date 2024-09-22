@@ -116,7 +116,7 @@ namespace EleganceParadisAPI.Controllers
         /// </remarks>
         /// <response code ="200">取得單筆訂單成功</response>
         /// <response code ="404">找不到此訂單</response>
-        [HttpGet("GetOrder/{orderId}")]
+        [HttpGet("GetOrder")]
         public async Task<IActionResult> GetOrder(string orderId)
         {
             var accountId = User.GetAccountId();
